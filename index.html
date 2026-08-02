@@ -63,13 +63,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
+            padding: 25px 20px;
             border-bottom: 3px solid var(--pf-gold);
             margin-bottom: 25px;
             background: var(--header-bg);
             border-radius: 6px;
             text-align: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* LOGO REESCALABLE RESPONSIVE */
+        .pf-main-logo {
+            max-width: 380px;
+            width: 80%;
+            height: auto;
+            display: block;
+            margin: 0 auto 8px auto;
+            filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.4));
+            transition: transform 0.2s;
         }
 
         .theme-btn-top {
@@ -88,6 +99,7 @@
             gap: 6px;
             backdrop-filter: blur(4px);
             transition: all 0.2s;
+            z-index: 10;
         }
 
         .theme-btn-top:hover {
@@ -98,11 +110,12 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 2.3rem;
+            font-size: 2rem;
             color: #ffffff !important;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .subtitle {
@@ -261,6 +274,14 @@
 
         /* ICONOS DE ACCIÓN */
         .pf-action-img {
+            height: 18px;
+            width: auto;
+            vertical-align: middle;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .pf-action-header-img {
             height: 22px;
             width: auto;
             vertical-align: middle;
@@ -433,6 +454,22 @@
             transform: translateY(-3px);
         }
 
+        /* Ajustes para pantallas pequeñas / móvil */
+        @media (max-width: 600px) {
+            header {
+                padding: 20px 10px;
+            }
+            .pf-main-logo {
+                max-width: 260px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .subtitle {
+                font-size: 0.9rem;
+            }
+        }
+
         footer {
             text-align: center;
             padding: 30px;
@@ -448,7 +485,9 @@
 <div class="container">
     <header>
         <div>
-            <h1>Compendio Mágico PF2e</h1>
+            <!-- LOGO PF2e REESCALABLE -->
+            <img src="./icons/PF2Logo.webp" alt="Pathfinder 2e Logo" class="pf-main-logo">
+            <h1>Compendio Mágico</h1>
             <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
         </div>
 
@@ -520,35 +559,64 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
-    // Convertidor de texto a las imágenes de acciones de /icons/
+    // Convertidor para la cabecera del conjuro
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
 
         if (t.includes('libre')) {
-            return `<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre" title="Acción Libre">`;
+            return `<img src="./icons/free_action.png" class="pf-action-header-img" alt="Acción Libre" title="Acción Libre">`;
         }
         if (t.includes('reacción') || t.includes('reaccion')) {
-            return `<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción" title="Reacción">`;
+            return `<img src="./icons/reaction.png" class="pf-action-header-img" alt="Reacción" title="Reacción">`;
         }
         if (t.includes('3') || t.includes('tres')) {
-            return `<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones" title="3 Acciones">`;
+            return `<img src="./icons/three_action.png" class="pf-action-header-img" alt="3 Acciones" title="3 Acciones">`;
         }
         if (t.includes('2') || t.includes('dos')) {
-            return `<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones" title="2 Acciones">`;
+            return `<img src="./icons/two_action.png" class="pf-action-header-img" alt="2 Acciones" title="2 Acciones">`;
         }
         if (t.includes('1') || t.includes('una')) {
-            return `<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción" title="1 Acción">`;
+            return `<img src="./icons/single_action.png" class="pf-action-header-img" alt="1 Acción" title="1 Acción">`;
         }
         if (t.includes('variable')) {
             return `
                 <span class="pf-actions-container">
-                    <img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción"> a 
-                    <img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">
+                    <img src="./icons/single_action.png" class="pf-action-header-img" alt="1 Acción"> a 
+                    <img src="./icons/three_action.png" class="pf-action-header-img" alt="3 Acciones">
                 </span>`;
         }
 
         return accText;
+    }
+
+    // Reemplaza referencias tanto en español como en inglés por los iconos
+    function reemplazarIconosEnTexto(texto) {
+        if (!esValido(texto)) return '';
+        
+        let resultado = texto;
+
+        const imgSingle = `<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">`;
+        const imgTwo = `<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">`;
+        const imgThree = `<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">`;
+        const imgReaction = `<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">`;
+        const imgFree = `<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">`;
+
+        // Textos en Castellano
+        resultado = resultado.replace(/Acción individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
+        resultado = resultado.replace(/Dos acciones:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
+        resultado = resultado.replace(/Tres acciones:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
+        resultado = resultado.replace(/Reacción:/gi, `${imgReaction} <strong>Reacción:</strong>`);
+        resultado = resultado.replace(/Acción libre:/gi, `${imgFree} <strong>Acción libre:</strong>`);
+
+        // Etiquetas en Inglés
+        resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
+        resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
+        resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
+        resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
+        resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
+
+        return resultado;
     }
 
     function toggleCardExpand(btn) {
@@ -645,9 +713,9 @@
                 const danoBase = getVal(item, 'Daño Base');
                 const tipoDano = getVal(item, 'Tipo de Daño');
                 
-                const resumenEfecto = getVal(item, 'Resumen Efecto');
-                const descripcionLarga = getVal(item, 'Descripción') || getVal(item, 'Efecto');
-                const potenciacion = getVal(item, 'Potenciación') || getVal(item, 'Potenciado');
+                const resumenEfecto = reemplazarIconosEnTexto(getVal(item, 'Resumen Efecto'));
+                const descripcionLarga = reemplazarIconosEnTexto(getVal(item, 'Descripción') || getVal(item, 'Efecto'));
+                const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
                 const fuente = getVal(item, 'Fuente');
 
                 const card = document.createElement('div');
