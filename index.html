@@ -38,7 +38,7 @@
             --header-bg: linear-gradient(180deg, #063d23 0%, #111813 100%);
         }
 
-        /* Invertir color de los iconos de acción en modo oscuro */
+        /* Invertir color de los iconos de acción en modo oscuro para legibilidad */
         body.dark-mode .pf-action-img,
         body.dark-mode .pf-action-header-img {
             filter: invert(1) brightness(1.8);
@@ -363,6 +363,7 @@
             font-size: 0.92rem;
             color: var(--pf-dark);
             margin-bottom: 6px;
+            white-space: pre-line;
         }
 
         /* BOTÓN DESPLEGABLE CON ICONO MÁS/MENOS */
@@ -401,13 +402,14 @@
         }
 
         .pf-description-full {
-            white-space: pre-line;
+            white-space: pre-line; /* Respeta saltos de linea de Google Sheets */
             margin-bottom: 8px;
         }
 
         .pf-boost-block {
             font-size: 0.9rem;
             margin-top: 8px;
+            white-space: pre-line;
         }
 
         .pf-boost-label {
@@ -558,7 +560,7 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
-    // Convertidor para la cabecera del conjuro (Soporta textos y símbolos ◆)
+    // Convertidor para la cabecera del conjuro (Soporta textos, números y símbolos ◆)
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
@@ -595,11 +597,14 @@
         
         let resultado = texto;
 
-        const imgSingle = `<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">`;
-        const imgTwo = `<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">`;
-        const imgThree = `<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">`;
-        const imgReaction = `<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">`;
-        const imgFree = `<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">`;
+        // 0. Limpiar basura de HTML previo o tags <img> incompletos si venían en el Excel
+        resultado = resultado.replace(/<img[^>]*>/gi, '');
+
+        const imgSingle = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
+        const imgTwo = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
+        const imgThree = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
+        const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
+        const imgFree = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
 
         // 1. Textos en Castellano del manual
         resultado = resultado.replace(/Acción individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
