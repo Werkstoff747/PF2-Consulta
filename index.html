@@ -7,14 +7,30 @@
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
+        /* MODO DÍA / CLARO (Estilo Libro/Manual Impreso) */
         :root {
-            /* Paleta Verde Oficial Pathfinder 2e Core */
+            --bg-color: #f4f1ea;
+            --card-bg: #ffffff;
+            --card-border: #d1c7b7;
+            --pf-green: #063d23;
+            --pf-green-light: #0d5c36;
+            --pf-gold: #b58d3d;
+            --pf-gold-light: #4d380e;
+            --text-main: #1f2421;
+            --text-muted: #57615a;
+            --tag-bg: #e8e3d8;
+            --damage-color: #dc2626;
+            --damage-bg: rgba(220, 38, 38, 0.08);
+            --header-bg: linear-gradient(180deg, rgba(6, 61, 35, 0.12) 0%, rgba(244, 241, 234, 0) 100%);
+        }
+
+        /* MODO NOCHE / OSCURO */
+        body.dark-mode {
             --bg-color: #0f1411;
             --card-bg: #181d19;
             --card-border: #2d3830;
             --pf-green: #063d23;
             --pf-green-light: #0d5c36;
-            --pf-green-bright: #107a46;
             --pf-gold: #c6a15a;
             --pf-gold-light: #e5cc93;
             --text-main: #e8e9e5;
@@ -22,6 +38,7 @@
             --tag-bg: #222a24;
             --damage-color: #ef4444;
             --damage-bg: rgba(239, 68, 68, 0.12);
+            --header-bg: linear-gradient(180deg, rgba(6, 61, 35, 0.5) 0%, rgba(15, 20, 17, 0) 100%);
         }
 
         * {
@@ -36,6 +53,7 @@
             color: var(--text-main);
             line-height: 1.6;
             padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
@@ -44,27 +62,55 @@
         }
 
         header {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
             padding: 30px 20px;
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 25px;
-            background: linear-gradient(180deg, rgba(6, 61, 35, 0.5) 0%, rgba(15, 20, 17, 0) 100%);
+            background: var(--header-bg);
             border-radius: 8px 8px 0 0;
             text-align: center;
+        }
+
+        /* Botón de cambio de tema en la parte superior derecha */
+        .theme-btn-top {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--pf-gold);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        .theme-btn-top:hover {
+            transform: scale(1.05);
+            background-color: var(--tag-bg);
         }
 
         h1 {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 2.4rem;
-            color: var(--pf-gold-light);
+            color: var(--pf-green);
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 4px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(13, 92, 54, 0.5);
             line-height: 1.1;
+        }
+
+        body.dark-mode h1 {
+            color: var(--pf-gold-light);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(13, 92, 54, 0.5);
         }
 
         .subtitle {
@@ -83,7 +129,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .controls-row-top {
@@ -104,7 +150,7 @@
             background-color: var(--bg-color);
             border: 1px solid var(--card-border);
             border-radius: 6px;
-            color: #fff;
+            color: var(--text-main);
             font-size: 0.95rem;
             outline: none;
             transition: border-color 0.2s;
@@ -123,7 +169,7 @@
 
         .level-label {
             font-size: 0.85rem;
-            color: var(--pf-gold);
+            color: var(--pf-gold-light);
             font-weight: 600;
         }
 
@@ -141,9 +187,9 @@
 
         .level-btn:hover, .level-btn.active {
             background-color: var(--pf-green);
-            color: var(--pf-gold-light);
+            color: #ffffff;
             border-color: var(--pf-gold);
-            box-shadow: 0 0 8px rgba(16, 122, 70, 0.5);
+            box-shadow: 0 0 8px rgba(16, 122, 70, 0.3);
         }
 
         .clear-btn {
@@ -159,12 +205,13 @@
 
         .clear-btn:hover {
             background-color: var(--pf-green);
+            color: #ffffff;
             border-color: var(--pf-gold);
         }
 
         .results-counter {
             font-size: 0.9rem;
-            color: var(--pf-gold);
+            color: var(--pf-gold-light);
             margin-bottom: 20px;
             font-style: italic;
             font-family: 'Georgia', serif;
@@ -177,7 +224,7 @@
         .section-title {
             font-family: 'Georgia', serif;
             font-size: 1.8rem;
-            color: var(--pf-gold-light);
+            color: #ffffff;
             background: linear-gradient(90deg, var(--pf-green) 0%, rgba(24, 29, 25, 0) 100%);
             padding: 6px 14px;
             border-left: 4px solid var(--pf-gold);
@@ -202,6 +249,7 @@
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .card::before {
@@ -217,7 +265,7 @@
         .card:hover {
             transform: translateY(-3px);
             border-color: var(--pf-gold);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
@@ -232,6 +280,10 @@
             font-family: 'Georgia', serif;
             font-size: 1.3rem;
             font-weight: 700;
+            color: var(--pf-green);
+        }
+
+        body.dark-mode .card-title {
             color: var(--pf-gold-light);
         }
 
@@ -244,8 +296,8 @@
 
         .card-page {
             font-size: 0.75rem;
-            background-color: rgba(6, 61, 35, 0.8);
-            color: var(--pf-gold-light);
+            background-color: rgba(6, 61, 35, 0.85);
+            color: #ffffff;
             padding: 3px 8px;
             border-radius: 4px;
             border: 1px solid var(--pf-gold);
@@ -254,13 +306,17 @@
 
         .card-meta {
             font-size: 0.85rem;
-            color: var(--pf-gold);
+            color: var(--pf-gold-light);
             margin-bottom: 12px;
             font-weight: 500;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.04);
             padding: 6px 10px;
             border-radius: 4px;
             border-left: 3px solid var(--pf-gold);
+        }
+
+        body.dark-mode .card-meta {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .card-damage {
@@ -285,7 +341,7 @@
         .card-boost {
             font-size: 0.85rem;
             color: var(--text-main);
-            background: rgba(34, 42, 36, 0.6);
+            background: var(--tag-bg);
             padding: 8px 10px;
             border-radius: 4px;
             margin-bottom: 12px;
@@ -309,26 +365,27 @@
         }
 
         .badge-level {
-            background-color: rgba(6, 61, 35, 0.7);
+            background-color: var(--pf-green);
             border-color: var(--pf-gold);
-            color: var(--pf-gold-light);
+            color: #ffffff;
             font-weight: bold;
         }
 
         .badge-tradition {
-            background-color: rgba(198, 161, 90, 0.15);
-            border-color: rgba(198, 161, 90, 0.4);
-            color: var(--pf-gold);
+            background-color: rgba(181, 141, 61, 0.15);
+            border-color: rgba(181, 141, 61, 0.4);
+            color: var(--pf-gold-light);
         }
 
         #loading {
             text-align: center;
             font-size: 1.2rem;
-            color: var(--pf-gold);
+            color: var(--pf-gold-light);
             padding: 40px;
             font-family: 'Georgia', serif;
         }
 
+        /* Botón flotante para subir (Inferior Derecha) */
         .scroll-top-btn {
             position: fixed;
             bottom: 25px;
@@ -337,21 +394,22 @@
             height: 45px;
             border-radius: 50%;
             background-color: var(--pf-green);
-            color: var(--pf-gold-light);
+            color: #ffffff;
             border: 1px solid var(--pf-gold);
             font-size: 1.2rem;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
             z-index: 100;
         }
 
         .scroll-top-btn:hover {
             transform: translateY(-3px);
             background-color: var(--pf-green-light);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
         }
 
         footer {
@@ -373,6 +431,11 @@
             <h1>Compendio Mágico PF2e</h1>
             <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
         </div>
+
+        <!-- Botón de Modo Día/Noche en la parte superior -->
+        <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
+            <span id="themeIcon">🌙</span>
+        </button>
     </header>
 
     <div class="controls">
@@ -410,13 +473,23 @@
     </footer>
 </div>
 
-<button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()">▲</button>
+<!-- Botón flotante inferior derecho para volver arriba -->
+<button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()" title="Volver arriba">▲</button>
 
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv';
 
     let datosGlobales = [];
     let currentLevel = 'all';
+
+    // Función para cambiar de Modo Día a Modo Noche
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        
+        document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('pf2e_theme', isDark ? 'dark' : 'light');
+    }
 
     function getVal(row, keyName) {
         if (!row) return '';
@@ -426,6 +499,13 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+        // Cargar tema preferido por el usuario
+        const savedTheme = localStorage.getItem('pf2e_theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
         Papa.parse(CSV_URL, {
             download: true,
             header: true,
@@ -445,6 +525,7 @@
             }
         });
 
+        // Evento para mostrar/ocultar el botón flotante de volver arriba
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('scrollTopBtn');
             btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
@@ -614,6 +695,7 @@
         }
     }
 
+    // Función para hacer scroll suave hasta arriba
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
