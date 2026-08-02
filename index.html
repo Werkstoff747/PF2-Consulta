@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos desde Google Sheets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 30px;
+            text-align: center;
+        }
+        h1 { color: #333; }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #0066cc;
+            color: white;
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h1>Datos de mi Google Sheet</h1>
+    <p id="cargando">Cargando datos...</p>
+
+    <table id="tabla-datos" style="display:none;">
+        <thead id="tabla-cabecera"></thead>
+        <tbody id="tabla-cuerpo"></tbody>
+    </table>
+
+    <script>
+        // ⚠️ REEMPLAZA ESTE ID POR EL DE TU HOJA DE GOOGLE SHEETS
+        const SHEET_ID = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv'; 
+        const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        fetch(URL)
+            .then(res => res.text())
+            .then(data => {
+                // Limpiamos la respuesta JSON que envía Google
+                const json = JSON.parse(data.substring(47, data.length - 2));
+                
+                const cols = json.table.cols;
+                const rows = json.table.rows;
+
+                // 1. Obtener encabezados
+                let cabeceraHTML = '<tr>';
+                cols.forEach(col => {
+                    cabeceraHTML += `<th>${col.label || ''}</th>`;
+                });
+                cabeceraHTML += '</tr>';
+                document.getElementById('tabla-cabecera').innerHTML = cabeceraHTML;
+
+                // 2. Obtener Filas / Celdas
+                let cuerpoHTML = '';
+                rows.forEach(row => {
+                    cuerpoHTML += '<tr>';
+                    row.c.forEach(cell => {
+                        cuerpoHTML += `<td>${cell ? cell.v : ''}</td>`;
+                    });
+                    cuerpoHTML += '</tr>';
+                });
+                document.getElementById('tabla-cuerpo').innerHTML = cuerpoHTML;
+
+                // Ocultar mensaje de carga y mostrar tabla
+                document.getElementById('cargando').style.display = 'none';
+                document.getElementById('tabla-datos').style.display = 'table';
+            })
+            .catch(error => {
+                console.error('Error al cargar la hoja:', error);
+                document.getElementById('cargando').innerText = 'Error al cargar los datos. Revisa el ID y los permisos.';
+            });
+    </script>
+
+</body>
+</html>
