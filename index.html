@@ -237,15 +237,15 @@
         .pf-header-row {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             border-bottom: 1.5px solid var(--line-color);
-            padding-bottom: 2px;
+            padding-bottom: 4px;
             margin-bottom: 8px;
         }
 
         .pf-title-container {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 8px;
             flex-wrap: wrap;
         }
@@ -259,10 +259,18 @@
             color: var(--pf-dark);
         }
 
-        .pf-actions-icon {
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -1px;
+        /* ICONOS DE ACCIÓN */
+        .pf-action-img {
+            height: 22px;
+            width: auto;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        .pf-actions-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
         }
 
         .pf-rank-badge {
@@ -358,7 +366,7 @@
             text-decoration: underline;
         }
 
-        /* CONTENIDO EXTENDIDO (OCULTO POR DEFECTO) */
+        /* CONTENIDO EXTENDIDO */
         .pf-expanded-content {
             display: none;
             margin-top: 10px;
@@ -512,19 +520,37 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
+    // Convertidor de texto a las imágenes de acciones de /icons/
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
-        if (t.includes('1') || t.includes('una')) return '◆';
-        if (t.includes('2') || t.includes('dos')) return '◆◆';
-        if (t.includes('3') || t.includes('tres')) return '◆◆◆';
-        if (t.includes('reacción') || t.includes('reaccion')) return '⬩';
-        if (t.includes('variable')) return '◆ a ◆◆◆';
-        if (t.includes('libre')) return '◇';
+
+        if (t.includes('libre')) {
+            return `<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre" title="Acción Libre">`;
+        }
+        if (t.includes('reacción') || t.includes('reaccion')) {
+            return `<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción" title="Reacción">`;
+        }
+        if (t.includes('3') || t.includes('tres')) {
+            return `<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones" title="3 Acciones">`;
+        }
+        if (t.includes('2') || t.includes('dos')) {
+            return `<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones" title="2 Acciones">`;
+        }
+        if (t.includes('1') || t.includes('una')) {
+            return `<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción" title="1 Acción">`;
+        }
+        if (t.includes('variable')) {
+            return `
+                <span class="pf-actions-container">
+                    <img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción"> a 
+                    <img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">
+                </span>`;
+        }
+
         return accText;
     }
 
-    // Función global para expandir o colapsar el contenido completo
     function toggleCardExpand(btn) {
         const expandedContent = btn.nextElementSibling;
         const isHidden = window.getComputedStyle(expandedContent).display === 'none';
@@ -619,7 +645,6 @@
                 const danoBase = getVal(item, 'Daño Base');
                 const tipoDano = getVal(item, 'Tipo de Daño');
                 
-                // Extraer el Resumen corto y la Descripción larga
                 const resumenEfecto = getVal(item, 'Resumen Efecto');
                 const descripcionLarga = getVal(item, 'Descripción') || getVal(item, 'Efecto');
                 const potenciacion = getVal(item, 'Potenciación') || getVal(item, 'Potenciado');
@@ -634,7 +659,7 @@
 
                 const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
                 const cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
-                const accionesIconos = formatearAcciones(accionesRaw);
+                const accionesHTML = formatearAcciones(accionesRaw);
 
                 // --- CAJAS DE RASGOS ---
                 const tagsVistos = new Set();
@@ -681,7 +706,7 @@
                     statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Daño</span> ${danoBase} ${tipoDano}</div>`;
                 }
 
-                // Lógica del Desplegable (Solo si hay Descripción larga o Potenciado)
+                // Desplegable
                 let expandSectionHTML = '';
                 const tieneTextoExtra = esValido(descripcionLarga) || esValido(potenciacion);
 
@@ -707,11 +732,11 @@
 
                 card.innerHTML = `
                     <div>
-                        <!-- Línea 1: Título y Rango -->
+                        <!-- Línea 1: Título e Iconos de Acción -->
                         <div class="pf-header-row">
                             <div class="pf-title-container">
                                 <span class="pf-title">${nombre || 'Sin Nombre'}</span>
-                                ${accionesIconos ? `<span class="pf-actions-icon">${accionesIconos}</span>` : ''}
+                                ${accionesHTML ? `${accionesHTML}` : ''}
                             </div>
                             <span class="pf-rank-badge">${cabeceraRangoText}</span>
                         </div>
