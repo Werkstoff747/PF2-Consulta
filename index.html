@@ -9,13 +9,13 @@
     <style>
         /* MODO DÍA / CLARO (Estilo Manual Impreso) */
         :root {
-            --bg-color: #e5e0d8;          /* Fondo pergamino algo más oscuro para dar contraste */
-            --card-bg: #ffffff;          /* Tarjetas blancas muy limpias */
+            --bg-color: #e5e0d8;          /* Fondo pergamino para dar contraste */
+            --card-bg: #ffffff;          /* Tarjetas blancas limpias */
             --card-border: #c8bfae;      /* Bordes sutiles estilo libro */
             --pf-green: #063d23;          /* Verde bosque profundo del manual */
             --pf-green-light: #0d5c36;
             --pf-gold: #b58d3d;           /* Dorado envejecido */
-            --pf-gold-light: #f3e5c8;     /* Dorado claro para texto de subtítulos sobre verde */
+            --pf-gold-light: #f3e5c8;     /* Dorado claro para texto sobre verde */
             --text-main: #1c201d;         /* Texto negro carbón */
             --text-muted: #57615a;       /* Gris medio para textos secundarios */
             --tag-bg: #eae4d8;           /* Fondo beige claro para los badges */
@@ -77,7 +77,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
-        /* Botón de cambio de tema integrado en la cabecera verde */
+        /* Botón de cambio de tema en la cabecera */
         .theme-btn-top {
             position: absolute;
             top: 15px;
@@ -105,7 +105,7 @@
         h1 {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 2.4rem;
-            color: #ffffff !important; /* Letra blanca pura en la cabecera */
+            color: #ffffff !important;
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 4px;
@@ -115,7 +115,7 @@
 
         .subtitle {
             font-size: 1.1rem;
-            color: var(--pf-gold-light); /* Dorado/amarillo elegante */
+            color: var(--pf-gold-light);
             font-style: italic;
             font-family: 'Georgia', serif;
         }
@@ -502,7 +502,6 @@
         return match && row[match] !== undefined && row[match] !== null ? row[match].toString().trim() : '';
     }
 
-    // Helper para comprobar si un valor es nulo o inváido (N/A)
     function esValido(val) {
         if (!val) return false;
         const v = val.toLowerCase().trim();
@@ -580,9 +579,9 @@
                 const nameEN = getVal(item, 'Name (EN)');
                 const categoria = getVal(item, 'Categoría');
                 const rango = getVal(item, 'Rango') || '1';
-                const tradicion = getVal(item, 'Tradición');
+                const tradicionRaw = getVal(item, 'Tradición');
                 const acciones = getVal(item, 'Acciones');
-                const rasgos = getVal(item, 'Rasgos');
+                const rasgosRaw = getVal(item, 'Rasgos');
                 const alcance = getVal(item, 'Alcance');
                 const areaObjetivo = getVal(item, 'Área/Objetivo');
                 const duracion = getVal(item, 'Duración');
@@ -590,7 +589,9 @@
                 const danoBase = getVal(item, 'Daño Base');
                 const tipoDano = getVal(item, 'Tipo de Daño');
                 const potenciacion = getVal(item, 'Potenciación');
-                const resumenEfecto = getVal(item, 'Resumen Efecto');
+                
+                // Buscar si existe columna Descripción/Efecto detallado, si no usará Resumen Efecto
+                const resumenEfecto = getVal(item, 'Descripción') || getVal(item, 'Efecto') || getVal(item, 'Resumen Efecto');
                 const fuente = getVal(item, 'Fuente');
 
                 const card = document.createElement('div');
@@ -598,9 +599,9 @@
                 card.setAttribute('data-name', `${nombre} ${nameEN}`);
                 card.setAttribute('data-desc', resumenEfecto);
                 card.setAttribute('data-level', rango);
-                card.setAttribute('data-traits', rasgos);
+                card.setAttribute('data-traits', rasgosRaw);
 
-                // 1. Metadatos de lanzamiento (Solo se muestran si son válidos)
+                // 1. Metadatos de lanzamiento
                 let metaPartes = [];
                 if (esValido(acciones)) metaPartes.push(`⚡ ${acciones}`);
                 if (esValido(alcance)) metaPartes.push(`🎯 ${alcance}`);
@@ -610,24 +611,54 @@
 
                 const metaText = metaPartes.join(' • ');
 
-                // 2. Bloque de Daño (SOLO si hay daño real)
+                // 2. Bloque de Daño
                 let danoText = '';
                 if (esValido(danoBase) || esValido(tipoDano)) {
                     danoText = `⚔️ <strong>Daño:</strong> ${danoBase} ${tipoDano}`.trim();
                 }
 
-                // 3. Bloque de Potenciación (SOLO si hay potenciación real)
+                // 3. Bloque de Potenciación
                 let boostHTML = '';
                 if (esValido(potenciacion)) {
                     boostHTML = `<div class="card-boost">📈 <strong>Potenciación:</strong> ${potenciacion}</div>`;
                 }
 
-                // 4. Badges de Rasgos
-                let rasgosHTML = '';
-                if (rasgos) {
-                    rasgos.split(',').forEach(r => {
+                // 4. Badges desduplicados
+                const tagsVistos = new Set();
+                let badgesHTML = '';
+
+                // Badge de Rango
+                const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
+                const textoRango = esTruco ? 'Rango 0' : `Rango ${rango}`;
+                badgesHTML += `<span class="badge badge-level">${textoRango}</span>`;
+                tagsVistos.add('truco');
+                tagsVistos.add(`rango ${rango.toLowerCase()}`);
+
+                // Tradiciones (separadas por comas)
+                if (esValido(tradicionRaw)) {
+                    tradicionRaw.split(',').forEach(t => {
+                        const tClean = t.trim();
+                        if (tClean && !tagsVistos.has(tClean.toLowerCase())) {
+                            badgesHTML += `<span class="badge badge-tradition">${tClean}</span>`;
+                            tagsVistos.add(tClean.toLowerCase());
+                        }
+                    });
+                }
+
+                // Categoría
+                if (esValido(categoria) && !tagsVistos.has(categoria.toLowerCase())) {
+                    badgesHTML += `<span class="badge">${categoria}</span>`;
+                    tagsVistos.add(categoria.toLowerCase());
+                }
+
+                // Rasgos (separados por comas)
+                if (esValido(rasgosRaw)) {
+                    rasgosRaw.split(',').forEach(r => {
                         const rClean = r.trim();
-                        if (rClean) rasgosHTML += `<span class="badge">${rClean}</span>`;
+                        if (rClean && !tagsVistos.has(rClean.toLowerCase())) {
+                            badgesHTML += `<span class="badge">${rClean}</span>`;
+                            tagsVistos.add(rClean.toLowerCase());
+                        }
                     });
                 }
 
@@ -647,10 +678,7 @@
                     </div>
                     
                     <div class="card-tags">
-                        ${rango ? `<span class="badge badge-level">Rango ${rango}</span>` : ''}
-                        ${tradicion ? `<span class="badge badge-tradition">${tradicion}</span>` : ''}
-                        ${categoria ? `<span class="badge">${categoria}</span>` : ''}
-                        ${rasgosHTML}
+                        ${badgesHTML}
                     </div>
                 `;
 
