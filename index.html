@@ -8,17 +8,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root {
-            /* Paleta Oficial Pathfinder 2e */
-            --bg-color: #12100e;
-            --card-bg: #1c1814;
-            --card-border: #3b3024;
-            --pf-burgundy: #63121a;
-            --pf-crimson: #8c1d27;
+            /* Paleta Verde Oficial Pathfinder 2e Core */
+            --bg-color: #0f1411;
+            --card-bg: #181d19;
+            --card-border: #2d3830;
+            --pf-green: #063d23;
+            --pf-green-light: #0d5c36;
+            --pf-green-bright: #107a46;
             --pf-gold: #c6a15a;
             --pf-gold-light: #e5cc93;
-            --text-main: #e8e2d5;
-            --text-muted: #a69a88;
-            --tag-bg: #2a231c;
+            --text-main: #e8e9e5;
+            --text-muted: #9fa8a1;
+            --tag-bg: #222a24;
             --damage-color: #ef4444;
             --damage-bg: rgba(239, 68, 68, 0.12);
         }
@@ -50,7 +51,7 @@
             padding: 30px 20px;
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 25px;
-            background: linear-gradient(180deg, rgba(99, 18, 26, 0.4) 0%, rgba(18, 16, 14, 0) 100%);
+            background: linear-gradient(180deg, rgba(6, 61, 35, 0.5) 0%, rgba(15, 20, 17, 0) 100%);
             border-radius: 8px 8px 0 0;
             text-align: center;
         }
@@ -62,7 +63,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 4px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(198, 161, 90, 0.3);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(13, 92, 54, 0.5);
             line-height: 1.1;
         }
 
@@ -139,10 +140,10 @@
         }
 
         .level-btn:hover, .level-btn.active {
-            background-color: var(--pf-burgundy);
+            background-color: var(--pf-green);
             color: var(--pf-gold-light);
             border-color: var(--pf-gold);
-            box-shadow: 0 0 8px rgba(198, 161, 90, 0.4);
+            box-shadow: 0 0 8px rgba(16, 122, 70, 0.5);
         }
 
         .clear-btn {
@@ -157,7 +158,7 @@
         }
 
         .clear-btn:hover {
-            background-color: var(--pf-burgundy);
+            background-color: var(--pf-green);
             border-color: var(--pf-gold);
         }
 
@@ -177,7 +178,7 @@
             font-family: 'Georgia', serif;
             font-size: 1.8rem;
             color: var(--pf-gold-light);
-            background: linear-gradient(90deg, var(--pf-burgundy) 0%, rgba(28, 24, 20, 0) 100%);
+            background: linear-gradient(90deg, var(--pf-green) 0%, rgba(24, 29, 25, 0) 100%);
             padding: 6px 14px;
             border-left: 4px solid var(--pf-gold);
             border-radius: 4px;
@@ -210,7 +211,7 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background-color: var(--pf-burgundy);
+            background-color: var(--pf-green-light);
         }
 
         .card:hover {
@@ -243,7 +244,7 @@
 
         .card-page {
             font-size: 0.75rem;
-            background-color: rgba(99, 18, 26, 0.6);
+            background-color: rgba(6, 61, 35, 0.8);
             color: var(--pf-gold-light);
             padding: 3px 8px;
             border-radius: 4px;
@@ -284,7 +285,7 @@
         .card-boost {
             font-size: 0.85rem;
             color: var(--text-main);
-            background: rgba(42, 35, 28, 0.6);
+            background: rgba(34, 42, 36, 0.6);
             padding: 8px 10px;
             border-radius: 4px;
             margin-bottom: 12px;
@@ -308,7 +309,7 @@
         }
 
         .badge-level {
-            background-color: rgba(99, 18, 26, 0.4);
+            background-color: rgba(6, 61, 35, 0.7);
             border-color: var(--pf-gold);
             color: var(--pf-gold-light);
             font-weight: bold;
@@ -335,7 +336,7 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            background-color: var(--pf-burgundy);
+            background-color: var(--pf-green);
             color: var(--pf-gold-light);
             border: 1px solid var(--pf-gold);
             font-size: 1.2rem;
@@ -350,7 +351,7 @@
 
         .scroll-top-btn:hover {
             transform: translateY(-3px);
-            background-color: var(--pf-crimson);
+            background-color: var(--pf-green-light);
         }
 
         footer {
