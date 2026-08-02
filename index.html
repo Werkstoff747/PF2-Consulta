@@ -3,44 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grimorio Mágico - Pathfinder 2e Remaster</title>
+    <title>Compendio Mágico PF2e Remaster</title>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Fuentes estilo Pathfinder / Paizo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto+Condensed:wght@400;700&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
     <style>
-        /* MODO DÍA / CLARO (Estilo Manual Impreso) */
+        /* MODO DÍA / CLARO (Fiel a la página del libro) */
         :root {
-            --bg-color: #e5e0d8;          /* Fondo pergamino para dar contraste */
-            --card-bg: #ffffff;          /* Tarjetas blancas limpias */
-            --card-border: #c8bfae;      /* Bordes sutiles estilo libro */
-            --pf-green: #063d23;          /* Verde bosque profundo del manual */
-            --pf-green-light: #0d5c36;
-            --pf-gold: #b58d3d;           /* Dorado envejecido */
-            --pf-gold-light: #f3e5c8;     /* Dorado claro para texto sobre verde */
-            --text-main: #1c201d;         /* Texto negro carbón */
-            --text-muted: #57615a;       /* Gris medio para textos secundarios */
-            --tag-bg: #eae4d8;           /* Fondo beige claro para los badges */
-            --damage-color: #be123c;      /* Carmesí para daño */
-            --damage-bg: #ffe4e6;
-            --boost-bg: #f5f0e6;          /* Fondo suave para potenciación */
-            --header-bg: var(--pf-green); /* Cabecera verde sólida */
+            --bg-color: #dfd8cc;           /* Fondo pergamino claro */
+            --card-bg: #ffffff;           /* Tarjeta blanca */
+            --card-border: #8c8375;       /* Borde suave */
+            --pf-burgundy: #580c1f;       /* Rojo granate oficial de rasgos */
+            --pf-gold: #b58d3d;           /* Borde dorado de rasgos */
+            --pf-dark: #111111;           /* Texto negro */
+            --text-muted: #555555;        /* Subtítulos */
+            --line-color: #222222;        /* Líneas divisorias impresas */
+            --header-bg: #063d23;         /* Verde bosque para la cabecera */
         }
 
         /* MODO NOCHE / OSCURO */
         body.dark-mode {
-            --bg-color: #0d120f;
-            --card-bg: #161c18;
-            --card-border: #28332b;
-            --pf-green: #063d23;
-            --pf-green-light: #0d5c36;
+            --bg-color: #0f1411;
+            --card-bg: #181d19;
+            --card-border: #38453c;
+            --pf-burgundy: #6b1428;
             --pf-gold: #c6a15a;
-            --pf-gold-light: #e5cc93;
-            --text-main: #e8e9e5;
-            --text-muted: #9fa8a1;
-            --tag-bg: #202722;
-            --damage-color: #ef4444;
-            --damage-bg: rgba(239, 68, 68, 0.12);
-            --boost-bg: rgba(34, 42, 36, 0.6);
-            --header-bg: linear-gradient(180deg, rgba(6, 61, 35, 0.8) 0%, rgba(13, 18, 15, 0.9) 100%);
+            --pf-dark: #e8e9e5;
+            --text-muted: #a6b2a9;
+            --line-color: #445448;
+            --header-bg: linear-gradient(180deg, #063d23 0%, #111813 100%);
         }
 
         * {
@@ -50,16 +45,16 @@
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, Roboto, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
+            color: var(--pf-dark);
+            line-height: 1.5;
             padding: 20px;
             transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
         }
 
@@ -68,16 +63,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 35px 20px;
+            padding: 30px 20px;
             border-bottom: 3px solid var(--pf-gold);
             margin-bottom: 25px;
             background: var(--header-bg);
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* Botón de cambio de tema en la cabecera */
         .theme-btn-top {
             position: absolute;
             top: 15px;
@@ -103,33 +97,30 @@
         }
 
         h1 {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 2.4rem;
+            font-family: 'Cinzel', serif;
+            font-size: 2.3rem;
             color: #ffffff !important;
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 4px;
-            line-height: 1.1;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .subtitle {
-            font-size: 1.1rem;
-            color: var(--pf-gold-light);
+            font-size: 1.05rem;
+            color: var(--pf-gold);
             font-style: italic;
-            font-family: 'Georgia', serif;
         }
 
         .controls {
             background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 18px;
+            border-radius: 6px;
             border: 1px solid var(--card-border);
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            gap: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
         }
 
         .controls-row-top {
@@ -146,67 +137,53 @@
 
         .search-box input {
             width: 100%;
-            padding: 10px 15px;
+            padding: 9px 14px;
             background-color: var(--bg-color);
             border: 1px solid var(--card-border);
-            border-radius: 6px;
-            color: var(--text-main);
+            border-radius: 4px;
+            color: var(--pf-dark);
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--pf-gold);
         }
 
         .level-filter-container {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
         .level-label {
             font-size: 0.85rem;
-            color: var(--text-main);
             font-weight: 700;
+            margin-right: 4px;
         }
 
         .level-btn {
-            padding: 4px 10px;
-            border-radius: 4px;
-            background-color: var(--tag-bg);
-            color: var(--text-main);
+            padding: 4px 9px;
+            border-radius: 3px;
+            background-color: var(--bg-color);
+            color: var(--pf-dark);
             border: 1px solid var(--card-border);
             font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .level-btn:hover, .level-btn.active {
-            background-color: var(--pf-green);
+            background-color: #063d23;
             color: #ffffff;
             border-color: var(--pf-gold);
-            box-shadow: 0 2px 6px rgba(6, 61, 35, 0.3);
         }
 
         .clear-btn {
-            background-color: var(--tag-bg);
+            background-color: var(--bg-color);
             border: 1px solid var(--card-border);
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 1.1rem;
-            transition: all 0.2s;
             color: var(--pf-gold);
-        }
-
-        .clear-btn:hover {
-            background-color: var(--pf-green);
-            color: #ffffff;
-            border-color: var(--pf-gold);
         }
 
         .results-counter {
@@ -214,7 +191,6 @@
             color: var(--text-muted);
             margin-bottom: 20px;
             font-style: italic;
-            font-family: 'Georgia', serif;
         }
 
         .discipline-section {
@@ -222,10 +198,10 @@
         }
 
         .section-title {
-            font-family: 'Georgia', serif;
+            font-family: 'Cinzel', serif;
             font-size: 1.8rem;
             color: #ffffff;
-            background: linear-gradient(90deg, var(--pf-green) 0%, rgba(6, 61, 35, 0.05) 100%);
+            background: linear-gradient(90deg, #063d23 0%, rgba(6, 61, 35, 0.05) 100%);
             padding: 6px 14px;
             border-left: 5px solid var(--pf-gold);
             border-radius: 4px;
@@ -234,163 +210,163 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 22px;
         }
 
+        /* TARJETA MAQUETADA SEGÚN MANUAL PF2E */
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 6px;
-            padding: 18px;
+            border-radius: 4px;
+            padding: 16px 18px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
             box-shadow: 0 3px 8px rgba(0,0,0,0.06);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background-color: var(--pf-green);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .card:hover {
-            transform: translateY(-3px);
-            border-color: var(--pf-gold);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
 
-        .card-header {
+        /* LÍNEA 1: CABECERA CONJURO */
+        .pf-header-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 2px;
-            gap: 10px;
+            align-items: baseline;
+            border-bottom: 1.5px solid var(--line-color);
+            padding-bottom: 2px;
+            margin-bottom: 8px;
         }
 
-        .card-title {
-            font-family: 'Georgia', serif;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--pf-green);
-        }
-
-        body.dark-mode .card-title {
-            color: var(--pf-gold-light);
-        }
-
-        .card-en {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 10px;
-        }
-
-        .card-page {
-            font-size: 0.75rem;
-            background-color: var(--pf-green);
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid var(--pf-gold);
-            white-space: nowrap;
-        }
-
-        .card-meta {
-            font-size: 0.85rem;
-            color: var(--text-main);
-            margin-bottom: 12px;
-            font-weight: 500;
-            background: rgba(0, 0, 0, 0.03);
-            padding: 6px 10px;
-            border-radius: 4px;
-            border-left: 3px solid var(--pf-gold);
-        }
-
-        body.dark-mode .card-meta {
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .card-damage {
-            font-size: 0.85rem;
-            color: var(--damage-color);
-            margin-bottom: 12px;
-            font-weight: 600;
-            background: var(--damage-bg);
-            padding: 6px 10px;
-            border-radius: 4px;
-            border-left: 3px solid var(--damage-color);
-        }
-
-        .card-desc {
-            font-size: 0.92rem;
-            color: var(--text-main);
-            flex-grow: 1;
-            white-space: pre-line;
-            margin-bottom: 12px;
-        }
-
-        .card-boost {
-            font-size: 0.85rem;
-            color: var(--text-main);
-            background: var(--boost-bg);
-            padding: 8px 10px;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            border: 1px dashed var(--pf-gold);
-        }
-
-        .card-tags {
-            margin-top: 10px;
+        .pf-title-container {
             display: flex;
-            gap: 6px;
+            align-items: baseline;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
-        .badge {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 3px;
-            background-color: var(--tag-bg);
-            color: var(--text-main);
-            border: 1px solid var(--card-border);
+        .pf-title {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--pf-dark);
         }
 
-        .badge-level {
-            background-color: var(--pf-green);
-            border-color: var(--pf-gold);
+        .pf-actions-icon {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .pf-rank-badge {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--pf-dark);
+            white-space: nowrap;
+        }
+
+        .pf-name-en {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: -6px;
+            margin-bottom: 8px;
+        }
+
+        /* LÍNEA 2: CAJAS DE RASGOS (TRAITS) */
+        .pf-traits-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .pf-trait-box {
+            background-color: var(--pf-burgundy);
             color: #ffffff;
-            font-weight: bold;
+            border: 1px solid var(--pf-gold);
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 1px 7px;
+            letter-spacing: 0.5px;
+            border-radius: 1px;
         }
 
-        .badge-tradition {
-            background-color: rgba(181, 141, 61, 0.18);
-            border-color: rgba(181, 141, 61, 0.5);
-            color: var(--text-main);
-            font-weight: 600;
+        .pf-trait-tradition {
+            background-color: #2b2b2b;
+        }
+
+        /* LÍNEA 3: ESTADÍSTICAS EN TEXTO PLANO */
+        .pf-stats-block {
+            font-size: 0.91rem;
+            margin-bottom: 10px;
+            line-height: 1.45;
+        }
+
+        .pf-stats-line {
+            margin-bottom: 3px;
+        }
+
+        .pf-stats-label {
+            font-weight: 700;
+            color: var(--pf-dark);
+        }
+
+        /* DIVISOR HORIZONTAL */
+        .pf-divider {
+            border: none;
+            border-top: 1px solid var(--line-color);
+            margin: 10px 0;
+        }
+
+        /* CUERPO Y POTENCIACIÓN */
+        .pf-description {
+            font-size: 0.92rem;
+            color: var(--pf-dark);
+            flex-grow: 1;
+            white-space: pre-line;
+            margin-bottom: 8px;
+        }
+
+        .pf-boost-block {
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+
+        .pf-boost-label {
+            font-weight: 700;
+        }
+
+        .pf-source-tag {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 6px;
+            font-style: italic;
         }
 
         #loading {
             text-align: center;
             font-size: 1.2rem;
-            color: var(--pf-green);
+            color: #063d23;
             padding: 40px;
-            font-family: 'Georgia', serif;
+            font-family: 'Cinzel', serif;
         }
 
         body.dark-mode #loading {
-            color: var(--pf-gold-light);
+            color: var(--pf-gold);
         }
 
-        /* Botón flotante para subir (Inferior Derecha) */
         .scroll-top-btn {
             position: fixed;
             bottom: 25px;
@@ -398,7 +374,7 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            background-color: var(--pf-green);
+            background-color: #063d23;
             color: #ffffff;
             border: 1px solid var(--pf-gold);
             font-size: 1.2rem;
@@ -407,14 +383,11 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            transition: all 0.2s ease;
             z-index: 100;
         }
 
         .scroll-top-btn:hover {
             transform: translateY(-3px);
-            background-color: var(--pf-green-light);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
         }
 
         footer {
@@ -424,7 +397,6 @@
             font-size: 0.85rem;
             border-top: 1px solid var(--card-border);
             margin-top: 50px;
-            font-family: 'Georgia', serif;
         }
     </style>
 </head>
@@ -437,7 +409,6 @@
             <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
         </div>
 
-        <!-- Botón de Modo Día/Noche -->
         <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
             <span id="themeIcon">🌙</span>
         </button>
@@ -474,11 +445,10 @@
     <div id="disciplinesWrapper"></div>
 
     <footer>
-        Compendio Mágico Pathfinder 2e — Generado dinámicamente desde Google Sheets.
+        Compendio Mágico Pathfinder 2e — Maquetado Remasterizado.
     </footer>
 </div>
 
-<!-- Botón flotante inferior derecho para volver arriba -->
 <button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()" title="Volver arriba">▲</button>
 
 <script>
@@ -490,7 +460,6 @@
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
-        
         document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
         localStorage.setItem('pf2e_theme', isDark ? 'dark' : 'light');
     }
@@ -506,6 +475,19 @@
         if (!val) return false;
         const v = val.toLowerCase().trim();
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
+    }
+
+    // Convertidor de texto de acciones a rombos ◆ oficiales de PF2e
+    function formatearAcciones(accText) {
+        if (!esValido(accText)) return '';
+        const t = accText.toLowerCase();
+        if (t.includes('1') || t.includes('una')) return '◆';
+        if (t.includes('2') || t.includes('dos')) return '◆◆';
+        if (t.includes('3') || t.includes('tres')) return '◆◆◆';
+        if (t.includes('reacción') || t.includes('reaccion')) return '⬩';
+        if (t.includes('variable')) return '◆ a ◆◆◆';
+        if (t.includes('libre')) return '◇';
+        return accText;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -580,7 +562,7 @@
                 const categoria = getVal(item, 'Categoría');
                 const rango = getVal(item, 'Rango') || '1';
                 const tradicionRaw = getVal(item, 'Tradición');
-                const acciones = getVal(item, 'Acciones');
+                const accionesRaw = getVal(item, 'Acciones');
                 const rasgosRaw = getVal(item, 'Rasgos');
                 const alcance = getVal(item, 'Alcance');
                 const areaObjetivo = getVal(item, 'Área/Objetivo');
@@ -590,96 +572,107 @@
                 const tipoDano = getVal(item, 'Tipo de Daño');
                 const potenciacion = getVal(item, 'Potenciación');
                 
-                // Buscar si existe columna Descripción/Efecto detallado, si no usará Resumen Efecto
-                const resumenEfecto = getVal(item, 'Descripción') || getVal(item, 'Efecto') || getVal(item, 'Resumen Efecto');
+                const descripcion = getVal(item, 'Descripción') || getVal(item, 'Efecto') || getVal(item, 'Resumen Efecto');
                 const fuente = getVal(item, 'Fuente');
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.setAttribute('data-name', `${nombre} ${nameEN}`);
-                card.setAttribute('data-desc', resumenEfecto);
+                card.setAttribute('data-desc', descripcion);
                 card.setAttribute('data-level', rango);
                 card.setAttribute('data-traits', rasgosRaw);
 
-                // 1. Metadatos de lanzamiento
-                let metaPartes = [];
-                if (esValido(acciones)) metaPartes.push(`⚡ ${acciones}`);
-                if (esValido(alcance)) metaPartes.push(`🎯 ${alcance}`);
-                if (esValido(areaObjetivo)) metaPartes.push(`📏 ${areaObjetivo}`);
-                if (esValido(duracion)) metaPartes.push(`⏳ ${duracion}`);
-                if (esValido(salvacion)) metaPartes.push(`🛡️ ${salvacion}`);
-
-                const metaText = metaPartes.join(' • ');
-
-                // 2. Bloque de Daño
-                let danoText = '';
-                if (esValido(danoBase) || esValido(tipoDano)) {
-                    danoText = `⚔️ <strong>Daño:</strong> ${danoBase} ${tipoDano}`.trim();
-                }
-
-                // 3. Bloque de Potenciación
-                let boostHTML = '';
-                if (esValido(potenciacion)) {
-                    boostHTML = `<div class="card-boost">📈 <strong>Potenciación:</strong> ${potenciacion}</div>`;
-                }
-
-                // 4. Badges desduplicados
-                const tagsVistos = new Set();
-                let badgesHTML = '';
-
-                // Badge de Rango
+                // Formato de Rango y Acciones
                 const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
-                const textoRango = esTruco ? 'Rango 0' : `Rango ${rango}`;
-                badgesHTML += `<span class="badge badge-level">${textoRango}</span>`;
-                tagsVistos.add('truco');
-                tagsVistos.add(`rango ${rango.toLowerCase()}`);
+                const cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
+                const accionesIconos = formatearAcciones(accionesRaw);
 
-                // Tradiciones (separadas por comas)
-                if (esValido(tradicionRaw)) {
-                    tradicionRaw.split(',').forEach(t => {
-                        const tClean = t.trim();
-                        if (tClean && !tagsVistos.has(tClean.toLowerCase())) {
-                            badgesHTML += `<span class="badge badge-tradition">${tClean}</span>`;
-                            tagsVistos.add(tClean.toLowerCase());
-                        }
-                    });
-                }
+                // --- CAJAS DE RASGOS (ESTILO GRANATE Y DORADO) ---
+                const tagsVistos = new Set();
+                let rasgosCajasHTML = '';
 
-                // Categoría
-                if (esValido(categoria) && !tagsVistos.has(categoria.toLowerCase())) {
-                    badgesHTML += `<span class="badge">${categoria}</span>`;
-                    tagsVistos.add(categoria.toLowerCase());
-                }
-
-                // Rasgos (separados por comas)
+                // Rasgos del conjuro (Concentrar, Manipular...)
                 if (esValido(rasgosRaw)) {
                     rasgosRaw.split(',').forEach(r => {
                         const rClean = r.trim();
                         if (rClean && !tagsVistos.has(rClean.toLowerCase())) {
-                            badgesHTML += `<span class="badge">${rClean}</span>`;
+                            rasgosCajasHTML += `<span class="pf-trait-box">${rClean}</span>`;
                             tagsVistos.add(rClean.toLowerCase());
                         }
                     });
                 }
+                
+                if (esValido(categoria) && !tagsVistos.has(categoria.toLowerCase())) {
+                    rasgosCajasHTML += `<span class="pf-trait-box">${categoria}</span>`;
+                    tagsVistos.add(categoria.toLowerCase());
+                }
+
+                // --- ESTADÍSTICAS EN TEXTO PLANO (ESTILO LIBRO) ---
+                let statsHTML = '';
+                
+                if (esValido(tradicionRaw)) {
+                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Tradiciones</span> ${tradicionRaw}</div>`;
+                }
+
+                let lineaDistanciaObj = [];
+                if (esValido(alcance)) lineaDistanciaObj.push(`<span class="pf-stats-label">Rango de distancia</span> ${alcance}`);
+                if (esValido(areaObjetivo)) lineaDistanciaObj.push(`<span class="pf-stats-label">Objetivos</span> ${areaObjetivo}`);
+                if (lineaDistanciaObj.length > 0) {
+                    statsHTML += `<div class="pf-stats-line">${lineaDistanciaObj.join('; ')}</div>`;
+                }
+
+                if (esValido(duracion)) {
+                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Duración</span> ${duracion}</div>`;
+                }
+
+                if (esValido(salvacion)) {
+                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Salvación</span> ${salvacion}</div>`;
+                }
+
+                if (esValido(danoBase) || esValido(tipoDano)) {
+                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Daño</span> ${danoBase} ${tipoDano}</div>`;
+                }
+
+                // --- SECCIÓN DE POTENCIACIÓN ---
+                let boostHTML = '';
+                if (esValido(potenciacion)) {
+                    boostHTML = `
+                        <hr class="pf-divider">
+                        <div class="pf-boost-block">
+                            <span class="pf-boost-label">Potenciado:</span> ${potenciacion}
+                        </div>
+                    `;
+                }
 
                 card.innerHTML = `
                     <div>
-                        <div class="card-header">
-                            <div class="card-title">${nombre || 'Sin Nombre'}</div>
-                            ${fuente ? `<div class="card-page">${fuente}</div>` : ''}
+                        <!-- Línea 1: Título y Rango -->
+                        <div class="pf-header-row">
+                            <div class="pf-title-container">
+                                <span class="pf-title">${nombre || 'Sin Nombre'}</span>
+                                ${accionesIconos ? `<span class="pf-actions-icon">${accionesIconos}</span>` : ''}
+                            </div>
+                            <span class="pf-rank-badge">${cabeceraRangoText}</span>
                         </div>
-                        ${nameEN ? `<div class="card-en">(${nameEN})</div>` : ''}
                         
-                        ${metaText ? `<div class="card-meta">${metaText}</div>` : ''}
-                        ${danoText ? `<div class="card-damage">${danoText}</div>` : ''}
-                        
-                        <div class="card-desc">${resumenEfecto || ''}</div>
+                        ${nameEN ? `<div class="pf-name-en">(${nameEN})</div>` : ''}
+
+                        <!-- Línea 2: Rasgos granates -->
+                        ${rasgosCajasHTML ? `<div class="pf-traits-row">${rasgosCajasHTML}</div>` : ''}
+
+                        <!-- Línea 3: Estadísticas -->
+                        ${statsHTML ? `<div class="pf-stats-block">${statsHTML}</div>` : ''}
+
+                        <hr class="pf-divider">
+
+                        <!-- Cuerpo: Descripción -->
+                        <div class="pf-description">${descripcion || ''}</div>
+
+                        <!-- Potenciado -->
                         ${boostHTML}
                     </div>
-                    
-                    <div class="card-tags">
-                        ${badgesHTML}
-                    </div>
+
+                    ${fuente ? `<div class="pf-source-tag">${fuente}</div>` : ''}
                 `;
 
                 grid.appendChild(card);
