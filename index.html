@@ -3,86 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base de Datos desde Google Sheets</title>
+    <title>Compendio Mágico PF2e - Google Sheets</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
         }
-        h1 { color: #333; }
-        table {
+        h1 { color: #701c26; }
+        .contenedor-tabla {
+            max-width: 95%;
             margin: 20px auto;
-            border-collapse: collapse;
-            width: 80%;
+            overflow-x: auto;
             background: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
-            overflow: hidden;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
         }
         th, td {
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
-            text-align: left;
         }
         th {
-            background-color: #0066cc;
+            background-color: #701c26;
             color: white;
+            position: sticky;
+            top: 0;
         }
         tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
     </style>
 </head>
 <body>
 
-    <h1>Datos de mi Google Sheet</h1>
-    <p id="cargando">Cargando datos...</p>
+    <h1>Compendio Mágico PF2e Remaster</h1>
+    <p id="cargando">Cargando datos desde Google Sheets...</p>
 
-    <table id="tabla-datos" style="display:none;">
-        <thead id="tabla-cabecera"></thead>
-        <tbody id="tabla-cuerpo"></tbody>
-    </table>
+    <div class="contenedor-tabla">
+        <table id="tabla-datos" style="display:none;">
+            <thead id="tabla-cabecera"></thead>
+            <tbody id="tabla-cuerpo"></tbody>
+        </table>
+    </div>
 
     <script>
-        // ⚠️ REEMPLAZA ESTE ID POR EL DE TU HOJA DE GOOGLE SHEETS
-        const SHEET_ID = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv'; 
-        const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        // Enlace público directo a tu archivo CSV de Google Sheets
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv'; 
 
-        fetch(URL)
+        // Función para procesar texto CSV respetando comillas
+        function parseCSV(text) {
+            let p = '', c = '', r = [];
+            let q = false;
+            let row = [''];
+            for (let i = 0; i < text.length; i++) {
+                c = text[i];
+                p = text[i - 1];
+                if (c === '"') {
+                    if (q && text[i + 1] === '"') { row[row.length - 1] += '"'; i++; }
+                    else { q = !q; }
+                } else if (c === ',' && !q) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !q) {
+                    if (c === '\r' && text[i + 1] === '\n') { i++; }
+                    r.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') { r.push(row); }
+            return r;
+        }
+
+        fetch(CSV_URL)
             .then(res => res.text())
-            .then(data => {
-                // Limpiamos la respuesta JSON que envía Google
-                const json = JSON.parse(data.substring(47, data.length - 2));
-                
-                const cols = json.table.cols;
-                const rows = json.table.rows;
+            .then(csvText => {
+                const filas = parseCSV(csvText);
 
-                // 1. Obtener encabezados
+                if (filas.length === 0) return;
+
+                // 1. Cabecera (Primera fila del CSV)
                 let cabeceraHTML = '<tr>';
-                cols.forEach(col => {
-                    cabeceraHTML += `<th>${col.label || ''}</th>`;
+                filas[0].forEach(col => {
+                    cabeceraHTML += `<th>${col}</th>`;
                 });
                 cabeceraHTML += '</tr>';
                 document.getElementById('tabla-cabecera').innerHTML = cabeceraHTML;
 
-                // 2. Obtener Filas / Celdas
+                // 2. Filas de Datos
                 let cuerpoHTML = '';
-                rows.forEach(row => {
+                for (let i = 1; i < filas.length; i++) {
+                    if (filas[i].length === 1 && filas[i][0] === '') continue; // Ignorar filas vacías
                     cuerpoHTML += '<tr>';
-                    row.c.forEach(cell => {
-                        cuerpoHTML += `<td>${cell ? cell.v : ''}</td>`;
+                    filas[i].forEach(celda => {
+                        cuerpoHTML += `<td>${celda}</td>`;
                     });
                     cuerpoHTML += '</tr>';
-                });
+                }
                 document.getElementById('tabla-cuerpo').innerHTML = cuerpoHTML;
 
-                // Ocultar mensaje de carga y mostrar tabla
+                // Mostrar tabla
                 document.getElementById('cargando').style.display = 'none';
                 document.getElementById('tabla-datos').style.display = 'table';
             })
             .catch(error => {
-                console.error('Error al cargar la hoja:', error);
-                document.getElementById('cargando').innerText = 'Error al cargar los datos. Revisa el ID y los permisos.';
+                console.error('Error al cargar el CSV:', error);
+                document.getElementById('cargando').innerText = 'Error al cargar los datos desde Google Sheets.';
             });
     </script>
 
