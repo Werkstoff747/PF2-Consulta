@@ -3,120 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compendio Mágico PF2e - Google Sheets</title>
+    <title>Compendio de Conjuros - Pathfinder 2e Remaster</title>
+    <!-- Librería PapaParse para procesar el CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: #16181f;
+            --card-border: #282c37;
+            --accent-red: #701c26;
+            --accent-crimson: #a82e3e;
+            --accent-gold: #d4af37;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --tag-bg: #1e222d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
             padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            padding: 30px 20px;
+            border-bottom: 2px solid var(--accent-red);
+            margin-bottom: 25px;
+            background: linear-gradient(180deg, rgba(112,28,38,0.2) 0%, rgba(13,14,18,0) 100%);
+            border-radius: 8px 8px 0 0;
+            text-align: left;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
             text-align: center;
         }
-        h1 { color: #701c26; }
-        .contenedor-tabla {
-            max-width: 95%;
-            margin: 20px auto;
-            overflow-x: auto;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        h1 {
+            font-family: 'Georgia', serif;
+            font-size: 2.3rem;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 10px rgba(168, 46, 62, 0.4);
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--accent-gold);
+            font-style: italic;
+        }
+
+        .controls {
+            background: var(--card-bg);
+            padding: 20px;
             border-radius: 8px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
-        table {
-            border-collapse: collapse;
+
+        .controls-row-top {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 2;
+            min-width: 240px;
+        }
+
+        .search-box input {
             width: 100%;
-            text-align: left;
-            font-size: 14px;
+            padding: 10px 15px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
         }
-        th, td {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
+
+        .search-box input:focus {
+            border-color: var(--accent-gold);
         }
-        th {
-            background-color: #701c26;
-            color: white;
-            position: sticky;
+
+        .level-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .level-label {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .level-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--tag-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .level-btn:hover, .level-btn.active {
+            background-color: var(--accent-red);
+            color: #fff;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+        }
+
+        .clear-btn {
+            background-color: var(--tag-bg);
+            border: 1px solid var(--card-border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .clear-btn:hover {
+            background-color: var(--accent-red);
+        }
+
+        .results-counter {
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .discipline-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-family: 'Georgia', serif;
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
             top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--accent-red);
         }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        tr:hover { background-color: #f1f1f1; }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .card-page {
+            font-size: 0.8rem;
+            background-color: rgba(112, 28, 38, 0.4);
+            color: #fca5a5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(168, 46, 62, 0.4);
+            white-space: nowrap;
+        }
+
+        .card-meta {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .card-desc {
+            font-size: 0.93rem;
+            color: var(--text-main);
+            flex-grow: 1;
+            white-space: pre-line;
+        }
+
+        .card-tags {
+            margin-top: 15px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background-color: var(--tag-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+        .badge-level {
+            background-color: rgba(212, 175, 55, 0.15);
+            border-color: rgba(212, 175, 55, 0.4);
+            color: var(--accent-gold);
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            padding: 40px;
+        }
+
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            color: #fff;
+            border: 1px solid var(--accent-gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .scroll-top-btn:hover {
+            transform: translateY(-3px);
+            background-color: var(--accent-crimson);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Compendio Mágico PF2e Remaster</h1>
-    <p id="cargando">Cargando datos desde Google Sheets...</p>
+<div class="container">
+    <header>
+        <div class="header-text">
+            <h1>Compendio Mágico PF2e</h1>
+            <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
+        </div>
+    </header>
 
-    <div class="contenedor-tabla">
-        <table id="tabla-datos" style="display:none;">
-            <thead id="tabla-cabecera"></thead>
-            <tbody id="tabla-cuerpo"></tbody>
-        </table>
+    <div class="controls">
+        <div class="controls-row-top">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por conjuro, palabras clave, efecto..." oninput="applyFilters()">
+            </div>
+            
+            <div class="level-filter-container">
+                <span class="level-label">Rango:</span>
+                <button class="level-btn active" data-level="all" onclick="filterLevel('all')">∞</button>
+                <button class="level-btn" data-level="0" onclick="filterLevel('0')">Truco</button>
+                <button class="level-btn" data-level="1" onclick="filterLevel('1')">1</button>
+                <button class="level-btn" data-level="2" onclick="filterLevel('2')">2</button>
+                <button class="level-btn" data-level="3" onclick="filterLevel('3')">3</button>
+                <button class="level-btn" data-level="4" onclick="filterLevel('4')">4</button>
+                <button class="level-btn" data-level="5" onclick="filterLevel('5')">5</button>
+                <button class="level-btn" data-level="6" onclick="filterLevel('6')">6</button>
+                <button class="level-btn" data-level="7" onclick="filterLevel('7')">7</button>
+                <button class="level-btn" data-level="8" onclick="filterLevel('8')">8</button>
+                <button class="level-btn" data-level="9" onclick="filterLevel('9')">9</button>
+                <button class="level-btn" data-level="10" onclick="filterLevel('10')">10</button>
+            </div>
+
+            <button class="clear-btn" onclick="clearAllFilters()" title="Limpiar filtros">🧹</button>
+        </div>
     </div>
 
-    <script>
-        // Enlace público directo a tu archivo CSV de Google Sheets
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv'; 
+    <div id="resultsCounter" class="results-counter"></div>
+    <div id="loading">Cargando compendio desde Google Sheets...</div>
+    <div id="disciplinesWrapper"></div>
 
-        // Función para procesar texto CSV respetando comillas
-        function parseCSV(text) {
-            let p = '', c = '', r = [];
-            let q = false;
-            let row = [''];
-            for (let i = 0; i < text.length; i++) {
-                c = text[i];
-                p = text[i - 1];
-                if (c === '"') {
-                    if (q && text[i + 1] === '"') { row[row.length - 1] += '"'; i++; }
-                    else { q = !q; }
-                } else if (c === ',' && !q) {
-                    row.push('');
-                } else if ((c === '\r' || c === '\n') && !q) {
-                    if (c === '\r' && text[i + 1] === '\n') { i++; }
-                    r.push(row);
-                    row = [''];
-                } else {
-                    row[row.length - 1] += c;
+    <footer>
+        Compendio de Conjuros para Pathfinder 2e — Generado dinámicamente desde Google Sheets.
+    </footer>
+</div>
+
+<button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()">▲</button>
+
+<script>
+    // Enlace a tu Google Sheet
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv';
+
+    let datosGlobales = [];
+    let currentLevel = 'all';
+
+    function obtenerValor(item, posiblesClaves) {
+        for (let clave of posiblesClaves) {
+            for (let prop in item) {
+                if (prop.trim().toLowerCase() === clave.toLowerCase()) {
+                    return item[prop];
                 }
             }
-            if (row.length > 1 || row[0] !== '') { r.push(row); }
-            return r;
         }
+        return '';
+    }
 
-        fetch(CSV_URL)
-            .then(res => res.text())
-            .then(csvText => {
-                const filas = parseCSV(csvText);
-
-                if (filas.length === 0) return;
-
-                // 1. Cabecera (Primera fila del CSV)
-                let cabeceraHTML = '<tr>';
-                filas[0].forEach(col => {
-                    cabeceraHTML += `<th>${col}</th>`;
+    window.addEventListener('DOMContentLoaded', () => {
+        Papa.parse(CSV_URL, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                datosGlobales = results.data.filter(row => {
+                    const nombre = obtenerValor(row, ['Nombre', 'Conjuro', 'Spell']);
+                    return nombre && nombre.toLowerCase() !== 'nombre';
                 });
-                cabeceraHTML += '</tr>';
-                document.getElementById('tabla-cabecera').innerHTML = cabeceraHTML;
 
-                // 2. Filas de Datos
-                let cuerpoHTML = '';
-                for (let i = 1; i < filas.length; i++) {
-                    if (filas[i].length === 1 && filas[i][0] === '') continue; // Ignorar filas vacías
-                    cuerpoHTML += '<tr>';
-                    filas[i].forEach(celda => {
-                        cuerpoHTML += `<td>${celda}</td>`;
-                    });
-                    cuerpoHTML += '</tr>';
-                }
-                document.getElementById('tabla-cuerpo').innerHTML = cuerpoHTML;
+                document.getElementById('loading').style.display = 'none';
+                renderizarCompendio(datosGlobales);
+            }
+        });
 
-                // Mostrar tabla
-                document.getElementById('cargando').style.display = 'none';
-                document.getElementById('tabla-datos').style.display = 'table';
-            })
-            .catch(error => {
-                console.error('Error al cargar el CSV:', error);
-                document.getElementById('cargando').innerText = 'Error al cargar los datos desde Google Sheets.';
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scrollTopBtn');
+            btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+    });
+
+    function renderizarCompendio(datos) {
+        const wrapper = document.getElementById('disciplinesWrapper');
+        wrapper.innerHTML = '';
+
+        const agrupados = {};
+        datos.forEach(row => {
+            const rango = obtenerValor(row, ['Rango', 'Nivel', 'Level', 'Tipo']) || 'General';
+            const claveAgrupacion = (rango.toLowerCase().includes('truco') || rango === '0') ? 'Trucos (Rango 0)' : `Conjuros de Rango ${rango}`;
+
+            if (!agrupados[claveAgrupacion]) agrupados[claveAgrupacion] = [];
+            agrupados[claveAgrupacion].push(row);
+        });
+
+        Object.keys(agrupados).sort().forEach(grupo => {
+            const sec = document.createElement('div');
+            sec.className = 'discipline-section';
+
+            sec.innerHTML = `
+                <h2 class="section-title">${grupo}</h2>
+                <div class="grid"></div>
+            `;
+
+            const grid = sec.querySelector('.grid');
+
+            agrupados[grupo].forEach(item => {
+                const nombre = obtenerValor(item, ['Nombre', 'Conjuro']);
+                const rango = obtenerValor(item, ['Rango', 'Nivel']);
+                const acciones = obtenerValor(item, ['Acciones', 'Coste', 'Tiempo']);
+                const tradicion = obtenerValor(item, ['Tradición', 'Tradicion', 'Escuela']);
+                const alcance = obtenerValor(item, ['Alcance', 'Rango de alcance', 'Objetivo']);
+                const tirada = obtenerValor(item, ['Tirada', 'Salvación', 'Guardado']);
+                const descripcion = obtenerValor(item, ['Descripción', 'Efecto', 'Resumen', 'Resumen Efecto']);
+                const fuente = obtenerValor(item, ['Fuente', 'Libro']);
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-name', nombre || '');
+                card.setAttribute('data-desc', descripcion || '');
+                card.setAttribute('data-level', rango || '0');
+
+                let metaPartes = [];
+                if (acciones) metaPartes.push(`⚡ ${acciones}`);
+                if (alcance) metaPartes.push(`🎯 ${alcance}`);
+                if (tirada) metaPartes.push(`🛡️ ${tirada}`);
+
+                const metaText = metaPartes.join(' • ');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="card-header">
+                            <div class="card-title">${nombre || 'Sin Nombre'}</div>
+                            ${fuente ? `<div class="card-page">${fuente}</div>` : ''}
+                        </div>
+                        ${metaText ? `<div class="card-meta">${metaText}</div>` : ''}
+                        <div class="card-desc">${descripcion || ''}</div>
+                    </div>
+                    <div class="card-tags">
+                        ${rango ? `<span class="badge badge-level">Rango ${rango}</span>` : ''}
+                        ${tradicion ? `<span class="badge">${tradicion}</span>` : ''}
+                    </div>
+                `;
+
+                grid.appendChild(card);
             });
-    </script>
+
+            wrapper.appendChild(sec);
+        });
+
+        applyFilters();
+    }
+
+    function filterLevel(level) {
+        currentLevel = level;
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-level') === level);
+        });
+        applyFilters();
+    }
+
+    function clearAllFilters() {
+        document.getElementById('searchInput').value = '';
+        filterLevel('all');
+    }
+
+    function applyFilters() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const sections = document.querySelectorAll('.discipline-section');
+        let totalVisibleCards = 0;
+
+        sections.forEach(section => {
+            const cards = section.querySelectorAll('.card');
+            let visibleCardsInSection = 0;
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name').toLowerCase();
+                const desc = card.getAttribute('data-desc').toLowerCase();
+                const level = card.getAttribute('data-level').toLowerCase();
+                const text = card.textContent.toLowerCase();
+
+                const matchesSearch = !query || name.includes(query) || desc.includes(query) || text.includes(query);
+                const matchesLevel = (currentLevel === 'all' || level.trim() === currentLevel || (currentLevel === '0' && level.includes('truco')));
+
+                if (matchesSearch && matchesLevel) {
+                    card.style.display = 'flex';
+                    visibleCardsInSection++;
+                    totalVisibleCards++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            section.style.display = visibleCardsInSection > 0 ? 'block' : 'none';
+        });
+
+        const counterEl = document.getElementById('resultsCounter');
+        if (counterEl) {
+            counterEl.textContent = `Mostrando ${totalVisibleCards} conjuro${totalVisibleCards === 1 ? '' : 's'}`;
+        }
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
 
 </body>
 </html>
