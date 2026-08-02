@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compendio de Conjuros - Pathfinder 2e Remaster</title>
+    <title>Compendio Mágico PF2e Remaster</title>
     <!-- Librería PapaParse para procesar el CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
@@ -17,6 +17,7 @@
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
             --tag-bg: #1e222d;
+            --damage-color: #f87171;
         }
 
         * {
@@ -46,14 +47,8 @@
             padding: 30px 20px;
             border-bottom: 2px solid var(--accent-red);
             margin-bottom: 25px;
-            background: linear-gradient(180deg, rgba(112,28,38,0.2) 0%, rgba(13,14,18,0) 100%);
+            background: linear-gradient(180deg, rgba(112,28,38,0.25) 0%, rgba(13,14,18,0) 100%);
             border-radius: 8px 8px 0 0;
-            text-align: left;
-        }
-
-        .header-text {
-            display: flex;
-            flex-direction: column;
             text-align: center;
         }
 
@@ -127,18 +122,14 @@
         }
 
         .level-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+            padding: 4px 10px;
+            border-radius: 15px;
             background-color: var(--tag-bg);
             color: var(--text-muted);
             border: 1px solid var(--card-border);
             font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
             transition: all 0.2s ease;
         }
 
@@ -185,7 +176,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
         }
 
@@ -222,7 +213,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             gap: 10px;
         }
 
@@ -232,8 +223,15 @@
             color: #fff;
         }
 
+        .card-en {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
         .card-page {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             background-color: rgba(112, 28, 38, 0.4);
             color: #fca5a5;
             padding: 3px 8px;
@@ -247,17 +245,44 @@
             color: var(--accent-gold);
             margin-bottom: 12px;
             font-weight: 500;
+            background: rgba(255,255,255,0.03);
+            padding: 6px 10px;
+            border-radius: 5px;
+            border-left: 2px solid var(--accent-gold);
+        }
+
+        .card-damage {
+            font-size: 0.85rem;
+            color: var(--damage-color);
+            margin-bottom: 12px;
+            font-weight: 600;
+            background: rgba(248, 113, 113, 0.1);
+            padding: 6px 10px;
+            border-radius: 5px;
+            border-left: 2px solid var(--damage-color);
         }
 
         .card-desc {
-            font-size: 0.93rem;
+            font-size: 0.92rem;
             color: var(--text-main);
             flex-grow: 1;
             white-space: pre-line;
+            margin-bottom: 12px;
+        }
+
+        .card-boost {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            font-style: italic;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px dashed var(--card-border);
         }
 
         .card-tags {
-            margin-top: 15px;
+            margin-top: 10px;
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
@@ -276,6 +301,12 @@
             background-color: rgba(212, 175, 55, 0.15);
             border-color: rgba(212, 175, 55, 0.4);
             color: var(--accent-gold);
+        }
+
+        .badge-tradition {
+            background-color: rgba(112, 28, 38, 0.2);
+            border-color: rgba(168, 46, 62, 0.3);
+            color: #fca5a5;
         }
 
         #loading {
@@ -324,7 +355,7 @@
 
 <div class="container">
     <header>
-        <div class="header-text">
+        <div>
             <h1>Compendio Mágico PF2e</h1>
             <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
         </div>
@@ -333,13 +364,13 @@
     <div class="controls">
         <div class="controls-row-top">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar por conjuro, palabras clave, efecto..." oninput="applyFilters()">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre, efecto, rasgos..." oninput="applyFilters()">
             </div>
             
             <div class="level-filter-container">
                 <span class="level-label">Rango:</span>
-                <button class="level-btn active" data-level="all" onclick="filterLevel('all')">∞</button>
-                <button class="level-btn" data-level="0" onclick="filterLevel('0')">Truco</button>
+                <button class="level-btn active" data-level="all" onclick="filterLevel('all')">Todos</button>
+                <button class="level-btn" data-level="0" onclick="filterLevel('0')">Trucos</button>
                 <button class="level-btn" data-level="1" onclick="filterLevel('1')">1</button>
                 <button class="level-btn" data-level="2" onclick="filterLevel('2')">2</button>
                 <button class="level-btn" data-level="3" onclick="filterLevel('3')">3</button>
@@ -361,28 +392,23 @@
     <div id="disciplinesWrapper"></div>
 
     <footer>
-        Compendio de Conjuros para Pathfinder 2e — Generado dinámicamente desde Google Sheets.
+        Compendio Mágico Pathfinder 2e — Generado dinámicamente desde Google Sheets.
     </footer>
 </div>
 
 <button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()">▲</button>
 
 <script>
-    // Enlace a tu Google Sheet
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv';
 
     let datosGlobales = [];
     let currentLevel = 'all';
 
-    function obtenerValor(item, posiblesClaves) {
-        for (let clave of posiblesClaves) {
-            for (let prop in item) {
-                if (prop.trim().toLowerCase() === clave.toLowerCase()) {
-                    return item[prop];
-                }
-            }
-        }
-        return '';
+    function getVal(row, keyName) {
+        if (!row) return '';
+        const keys = Object.keys(row);
+        const match = keys.find(k => k.trim().toLowerCase() === keyName.trim().toLowerCase());
+        return match && row[match] !== undefined && row[match] !== null ? row[match].toString().trim() : '';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -392,12 +418,16 @@
             skipEmptyLines: true,
             complete: function(results) {
                 datosGlobales = results.data.filter(row => {
-                    const nombre = obtenerValor(row, ['Nombre', 'Conjuro', 'Spell']);
+                    const nombre = getVal(row, 'Nombre');
                     return nombre && nombre.toLowerCase() !== 'nombre';
                 });
 
                 document.getElementById('loading').style.display = 'none';
                 renderizarCompendio(datosGlobales);
+            },
+            error: function(err) {
+                console.error("Error al leer el CSV:", err);
+                document.getElementById('loading').innerText = "Error al cargar los datos desde Google Sheets.";
             }
         });
 
@@ -413,14 +443,24 @@
 
         const agrupados = {};
         datos.forEach(row => {
-            const rango = obtenerValor(row, ['Rango', 'Nivel', 'Level', 'Tipo']) || 'General';
-            const claveAgrupacion = (rango.toLowerCase().includes('truco') || rango === '0') ? 'Trucos (Rango 0)' : `Conjuros de Rango ${rango}`;
+            const rangoRaw = getVal(row, 'Rango') || '1';
+            let claveAgrupacion = 'Conjuros de Rango ' + rangoRaw;
+            
+            if (rangoRaw === '0' || rangoRaw.toLowerCase().includes('truco')) {
+                claveAgrupacion = 'Trucos (Rango 0)';
+            }
 
             if (!agrupados[claveAgrupacion]) agrupados[claveAgrupacion] = [];
             agrupados[claveAgrupacion].push(row);
         });
 
-        Object.keys(agrupados).sort().forEach(grupo => {
+        const ordenSecciones = Object.keys(agrupados).sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.replace(/\D/g, '')) || 0;
+            return numA - numB;
+        });
+
+        ordenSecciones.forEach(grupo => {
             const sec = document.createElement('div');
             sec.className = 'discipline-section';
 
@@ -432,27 +472,54 @@
             const grid = sec.querySelector('.grid');
 
             agrupados[grupo].forEach(item => {
-                const nombre = obtenerValor(item, ['Nombre', 'Conjuro']);
-                const rango = obtenerValor(item, ['Rango', 'Nivel']);
-                const acciones = obtenerValor(item, ['Acciones', 'Coste', 'Tiempo']);
-                const tradicion = obtenerValor(item, ['Tradición', 'Tradicion', 'Escuela']);
-                const alcance = obtenerValor(item, ['Alcance', 'Rango de alcance', 'Objetivo']);
-                const tirada = obtenerValor(item, ['Tirada', 'Salvación', 'Guardado']);
-                const descripcion = obtenerValor(item, ['Descripción', 'Efecto', 'Resumen', 'Resumen Efecto']);
-                const fuente = obtenerValor(item, ['Fuente', 'Libro']);
+                const nombre = getVal(item, 'Nombre');
+                const nameEN = getVal(item, 'Name (EN)');
+                const categoria = getVal(item, 'Categoría');
+                const rango = getVal(item, 'Rango') || '1';
+                const tradicion = getVal(item, 'Tradición');
+                const acciones = getVal(item, 'Acciones');
+                const rasgos = getVal(item, 'Rasgos');
+                const alcance = getVal(item, 'Alcance');
+                const areaObjetivo = getVal(item, 'Área/Objetivo');
+                const duracion = getVal(item, 'Duración');
+                const salvacion = getVal(item, 'Salvación');
+                const danoBase = getVal(item, 'Daño Base');
+                const tipoDano = getVal(item, 'Tipo de Daño');
+                const potenciacion = getVal(item, 'Potenciación');
+                const resumenEfecto = getVal(item, 'Resumen Efecto');
+                const fuente = getVal(item, 'Fuente');
 
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.setAttribute('data-name', nombre || '');
-                card.setAttribute('data-desc', descripcion || '');
-                card.setAttribute('data-level', rango || '0');
+                card.setAttribute('data-name', `${nombre} ${nameEN}`);
+                card.setAttribute('data-desc', resumenEfecto);
+                card.setAttribute('data-level', rango);
+                card.setAttribute('data-traits', rasgos);
 
+                // 1. Metadatos de lanzamiento
                 let metaPartes = [];
                 if (acciones) metaPartes.push(`⚡ ${acciones}`);
                 if (alcance) metaPartes.push(`🎯 ${alcance}`);
-                if (tirada) metaPartes.push(`🛡️ ${tirada}`);
+                if (areaObjetivo) metaPartes.push(`📏 ${areaObjetivo}`);
+                if (duracion) metaPartes.push(`⏳ ${duracion}`);
+                if (salvacion) metaPartes.push(`🛡️ ${salvacion}`);
 
                 const metaText = metaPartes.join(' • ');
+
+                // 2. Metadatos de daño
+                let danoText = '';
+                if (danoBase || tipoDano) {
+                    danoText = `⚔️ <strong>Daño:</strong> ${danoBase} ${tipoDano}`;
+                }
+
+                // 3. Procesar Rasgos en badges
+                let rasgosHTML = '';
+                if (rasgos) {
+                    rasgos.split(',').forEach(r => {
+                        const rClean = r.trim();
+                        if (rClean) rasgosHTML += `<span class="badge">${rClean}</span>`;
+                    });
+                }
 
                 card.innerHTML = `
                     <div>
@@ -460,12 +527,20 @@
                             <div class="card-title">${nombre || 'Sin Nombre'}</div>
                             ${fuente ? `<div class="card-page">${fuente}</div>` : ''}
                         </div>
+                        ${nameEN ? `<div class="card-en">(${nameEN})</div>` : ''}
+                        
                         ${metaText ? `<div class="card-meta">${metaText}</div>` : ''}
-                        <div class="card-desc">${descripcion || ''}</div>
+                        ${danoText ? `<div class="card-damage">${danoText}</div>` : ''}
+                        
+                        <div class="card-desc">${resumenEfecto || ''}</div>
+                        ${potenciacion ? `<div class="card-boost">📈 <strong>Potenciación:</strong> ${potenciacion}</div>` : ''}
                     </div>
+                    
                     <div class="card-tags">
                         ${rango ? `<span class="badge badge-level">Rango ${rango}</span>` : ''}
-                        ${tradicion ? `<span class="badge">${tradicion}</span>` : ''}
+                        ${tradicion ? `<span class="badge badge-tradition">${tradicion}</span>` : ''}
+                        ${categoria ? `<span class="badge">${categoria}</span>` : ''}
+                        ${rasgosHTML}
                     </div>
                 `;
 
@@ -503,10 +578,11 @@
             cards.forEach(card => {
                 const name = card.getAttribute('data-name').toLowerCase();
                 const desc = card.getAttribute('data-desc').toLowerCase();
+                const traits = card.getAttribute('data-traits').toLowerCase();
                 const level = card.getAttribute('data-level').toLowerCase();
                 const text = card.textContent.toLowerCase();
 
-                const matchesSearch = !query || name.includes(query) || desc.includes(query) || text.includes(query);
+                const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query) || text.includes(query);
                 const matchesLevel = (currentLevel === 'all' || level.trim() === currentLevel || (currentLevel === '0' && level.includes('truco')));
 
                 if (matchesSearch && matchesLevel) {
