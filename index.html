@@ -7,38 +7,40 @@
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        /* MODO DÍA / CLARO (Estilo Libro/Manual Impreso) */
+        /* MODO DÍA / CLARO (Estilo Manual Impreso) */
         :root {
-            --bg-color: #f4f1ea;
-            --card-bg: #ffffff;
-            --card-border: #d1c7b7;
-            --pf-green: #063d23;
+            --bg-color: #e5e0d8;          /* Fondo pergamino algo más oscuro para dar contraste */
+            --card-bg: #ffffff;          /* Tarjetas blancas muy limpias */
+            --card-border: #c8bfae;      /* Bordes sutiles estilo libro */
+            --pf-green: #063d23;          /* Verde bosque profundo del manual */
             --pf-green-light: #0d5c36;
-            --pf-gold: #b58d3d;
-            --pf-gold-light: #4d380e;
-            --text-main: #1f2421;
-            --text-muted: #57615a;
-            --tag-bg: #e8e3d8;
-            --damage-color: #dc2626;
-            --damage-bg: rgba(220, 38, 38, 0.08);
-            --header-bg: linear-gradient(180deg, rgba(6, 61, 35, 0.12) 0%, rgba(244, 241, 234, 0) 100%);
+            --pf-gold: #b58d3d;           /* Dorado envejecido */
+            --pf-gold-light: #f3e5c8;     /* Dorado claro para texto de subtítulos sobre verde */
+            --text-main: #1c201d;         /* Texto negro carbón */
+            --text-muted: #57615a;       /* Gris medio para textos secundarios */
+            --tag-bg: #eae4d8;           /* Fondo beige claro para los badges */
+            --damage-color: #be123c;      /* Carmesí para daño */
+            --damage-bg: #ffe4e6;
+            --boost-bg: #f5f0e6;          /* Fondo suave para potenciación */
+            --header-bg: var(--pf-green); /* Cabecera verde sólida */
         }
 
         /* MODO NOCHE / OSCURO */
         body.dark-mode {
-            --bg-color: #0f1411;
-            --card-bg: #181d19;
-            --card-border: #2d3830;
+            --bg-color: #0d120f;
+            --card-bg: #161c18;
+            --card-border: #28332b;
             --pf-green: #063d23;
             --pf-green-light: #0d5c36;
             --pf-gold: #c6a15a;
             --pf-gold-light: #e5cc93;
             --text-main: #e8e9e5;
             --text-muted: #9fa8a1;
-            --tag-bg: #222a24;
+            --tag-bg: #202722;
             --damage-color: #ef4444;
             --damage-bg: rgba(239, 68, 68, 0.12);
-            --header-bg: linear-gradient(180deg, rgba(6, 61, 35, 0.5) 0%, rgba(15, 20, 17, 0) 100%);
+            --boost-bg: rgba(34, 42, 36, 0.6);
+            --header-bg: linear-gradient(180deg, rgba(6, 61, 35, 0.8) 0%, rgba(13, 18, 15, 0.9) 100%);
         }
 
         * {
@@ -66,22 +68,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
-            border-bottom: 2px solid var(--pf-gold);
+            padding: 35px 20px;
+            border-bottom: 3px solid var(--pf-gold);
             margin-bottom: 25px;
             background: var(--header-bg);
-            border-radius: 8px 8px 0 0;
+            border-radius: 8px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
-        /* Botón de cambio de tema en la parte superior derecha */
+        /* Botón de cambio de tema integrado en la cabecera verde */
         .theme-btn-top {
             position: absolute;
             top: 15px;
             right: 15px;
-            background-color: var(--card-bg);
+            background-color: rgba(255, 255, 255, 0.15);
             border: 1px solid var(--pf-gold);
-            color: var(--text-main);
+            color: #ffffff;
             padding: 6px 12px;
             border-radius: 20px;
             cursor: pointer;
@@ -89,33 +92,30 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            backdrop-filter: blur(4px);
             transition: all 0.2s;
         }
 
         .theme-btn-top:hover {
             transform: scale(1.05);
-            background-color: var(--tag-bg);
+            background-color: var(--pf-gold);
+            color: #000;
         }
 
         h1 {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 2.4rem;
-            color: var(--pf-green);
+            color: #ffffff !important; /* Letra blanca pura en la cabecera */
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 4px;
             line-height: 1.1;
-        }
-
-        body.dark-mode h1 {
-            color: var(--pf-gold-light);
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(13, 92, 54, 0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .subtitle {
-            font-size: 1.05rem;
-            color: var(--pf-gold);
+            font-size: 1.1rem;
+            color: var(--pf-gold-light); /* Dorado/amarillo elegante */
             font-style: italic;
             font-family: 'Georgia', serif;
         }
@@ -124,12 +124,12 @@
             background: var(--card-bg);
             padding: 20px;
             border-radius: 8px;
-            border: 1px solid var(--pf-gold);
+            border: 1px solid var(--card-border);
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
         .controls-row-top {
@@ -169,15 +169,15 @@
 
         .level-label {
             font-size: 0.85rem;
-            color: var(--pf-gold-light);
-            font-weight: 600;
+            color: var(--text-main);
+            font-weight: 700;
         }
 
         .level-btn {
             padding: 4px 10px;
             border-radius: 4px;
             background-color: var(--tag-bg);
-            color: var(--text-muted);
+            color: var(--text-main);
             border: 1px solid var(--card-border);
             font-size: 0.85rem;
             font-weight: 700;
@@ -189,7 +189,7 @@
             background-color: var(--pf-green);
             color: #ffffff;
             border-color: var(--pf-gold);
-            box-shadow: 0 0 8px rgba(16, 122, 70, 0.3);
+            box-shadow: 0 2px 6px rgba(6, 61, 35, 0.3);
         }
 
         .clear-btn {
@@ -211,7 +211,7 @@
 
         .results-counter {
             font-size: 0.9rem;
-            color: var(--pf-gold-light);
+            color: var(--text-muted);
             margin-bottom: 20px;
             font-style: italic;
             font-family: 'Georgia', serif;
@@ -225,9 +225,9 @@
             font-family: 'Georgia', serif;
             font-size: 1.8rem;
             color: #ffffff;
-            background: linear-gradient(90deg, var(--pf-green) 0%, rgba(24, 29, 25, 0) 100%);
+            background: linear-gradient(90deg, var(--pf-green) 0%, rgba(6, 61, 35, 0.05) 100%);
             padding: 6px 14px;
-            border-left: 4px solid var(--pf-gold);
+            border-left: 5px solid var(--pf-gold);
             border-radius: 4px;
             margin-bottom: 20px;
         }
@@ -249,7 +249,7 @@
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.06);
         }
 
         .card::before {
@@ -259,26 +259,26 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background-color: var(--pf-green-light);
+            background-color: var(--pf-green);
         }
 
         .card:hover {
             transform: translateY(-3px);
             border-color: var(--pf-gold);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             gap: 10px;
         }
 
         .card-title {
             font-family: 'Georgia', serif;
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: var(--pf-green);
         }
@@ -296,7 +296,7 @@
 
         .card-page {
             font-size: 0.75rem;
-            background-color: rgba(6, 61, 35, 0.85);
+            background-color: var(--pf-green);
             color: #ffffff;
             padding: 3px 8px;
             border-radius: 4px;
@@ -306,10 +306,10 @@
 
         .card-meta {
             font-size: 0.85rem;
-            color: var(--pf-gold-light);
+            color: var(--text-main);
             margin-bottom: 12px;
             font-weight: 500;
-            background: rgba(0, 0, 0, 0.04);
+            background: rgba(0, 0, 0, 0.03);
             padding: 6px 10px;
             border-radius: 4px;
             border-left: 3px solid var(--pf-gold);
@@ -341,7 +341,7 @@
         .card-boost {
             font-size: 0.85rem;
             color: var(--text-main);
-            background: var(--tag-bg);
+            background: var(--boost-bg);
             padding: 8px 10px;
             border-radius: 4px;
             margin-bottom: 12px;
@@ -360,7 +360,7 @@
             padding: 3px 8px;
             border-radius: 3px;
             background-color: var(--tag-bg);
-            color: var(--text-muted);
+            color: var(--text-main);
             border: 1px solid var(--card-border);
         }
 
@@ -372,17 +372,22 @@
         }
 
         .badge-tradition {
-            background-color: rgba(181, 141, 61, 0.15);
-            border-color: rgba(181, 141, 61, 0.4);
-            color: var(--pf-gold-light);
+            background-color: rgba(181, 141, 61, 0.18);
+            border-color: rgba(181, 141, 61, 0.5);
+            color: var(--text-main);
+            font-weight: 600;
         }
 
         #loading {
             text-align: center;
             font-size: 1.2rem;
-            color: var(--pf-gold-light);
+            color: var(--pf-green);
             padding: 40px;
             font-family: 'Georgia', serif;
+        }
+
+        body.dark-mode #loading {
+            color: var(--pf-gold-light);
         }
 
         /* Botón flotante para subir (Inferior Derecha) */
@@ -401,7 +406,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             transition: all 0.2s ease;
             z-index: 100;
         }
@@ -409,7 +414,7 @@
         .scroll-top-btn:hover {
             transform: translateY(-3px);
             background-color: var(--pf-green-light);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
         }
 
         footer {
@@ -432,7 +437,7 @@
             <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
         </div>
 
-        <!-- Botón de Modo Día/Noche en la parte superior -->
+        <!-- Botón de Modo Día/Noche -->
         <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
             <span id="themeIcon">🌙</span>
         </button>
@@ -482,7 +487,6 @@
     let datosGlobales = [];
     let currentLevel = 'all';
 
-    // Función para cambiar de Modo Día a Modo Noche
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
@@ -498,8 +502,14 @@
         return match && row[match] !== undefined && row[match] !== null ? row[match].toString().trim() : '';
     }
 
+    // Helper para comprobar si un valor es nulo o inváido (N/A)
+    function esValido(val) {
+        if (!val) return false;
+        const v = val.toLowerCase().trim();
+        return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
-        // Cargar tema preferido por el usuario
         const savedTheme = localStorage.getItem('pf2e_theme');
         if (savedTheme === 'dark') {
             document.body.classList.add('dark-mode');
@@ -525,7 +535,6 @@
             }
         });
 
-        // Evento para mostrar/ocultar el botón flotante de volver arriba
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('scrollTopBtn');
             btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
@@ -591,20 +600,29 @@
                 card.setAttribute('data-level', rango);
                 card.setAttribute('data-traits', rasgos);
 
+                // 1. Metadatos de lanzamiento (Solo se muestran si son válidos)
                 let metaPartes = [];
-                if (acciones) metaPartes.push(`⚡ ${acciones}`);
-                if (alcance) metaPartes.push(`🎯 ${alcance}`);
-                if (areaObjetivo) metaPartes.push(`📏 ${areaObjetivo}`);
-                if (duracion) metaPartes.push(`⏳ ${duracion}`);
-                if (salvacion) metaPartes.push(`🛡️ ${salvacion}`);
+                if (esValido(acciones)) metaPartes.push(`⚡ ${acciones}`);
+                if (esValido(alcance)) metaPartes.push(`🎯 ${alcance}`);
+                if (esValido(areaObjetivo)) metaPartes.push(`📏 ${areaObjetivo}`);
+                if (esValido(duracion)) metaPartes.push(`⏳ ${duracion}`);
+                if (esValido(salvacion)) metaPartes.push(`🛡️ ${salvacion}`);
 
                 const metaText = metaPartes.join(' • ');
 
+                // 2. Bloque de Daño (SOLO si hay daño real)
                 let danoText = '';
-                if (danoBase || tipoDano) {
-                    danoText = `⚔️ <strong>Daño:</strong> ${danoBase} ${tipoDano}`;
+                if (esValido(danoBase) || esValido(tipoDano)) {
+                    danoText = `⚔️ <strong>Daño:</strong> ${danoBase} ${tipoDano}`.trim();
                 }
 
+                // 3. Bloque de Potenciación (SOLO si hay potenciación real)
+                let boostHTML = '';
+                if (esValido(potenciacion)) {
+                    boostHTML = `<div class="card-boost">📈 <strong>Potenciación:</strong> ${potenciacion}</div>`;
+                }
+
+                // 4. Badges de Rasgos
                 let rasgosHTML = '';
                 if (rasgos) {
                     rasgos.split(',').forEach(r => {
@@ -625,7 +643,7 @@
                         ${danoText ? `<div class="card-damage">${danoText}</div>` : ''}
                         
                         <div class="card-desc">${resumenEfecto || ''}</div>
-                        ${potenciacion ? `<div class="card-boost">📈 <strong>Potenciación:</strong> ${potenciacion}</div>` : ''}
+                        ${boostHTML}
                     </div>
                     
                     <div class="card-tags">
@@ -695,7 +713,6 @@
         }
     }
 
-    // Función para hacer scroll suave hasta arriba
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
