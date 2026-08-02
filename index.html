@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compendio Mágico (Remaster)</title>
+    <title>Compendio Mágico PF2e Remaster</title>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Fuentes estilo Pathfinder / Paizo -->
@@ -85,7 +85,7 @@
             width: 75%;
             height: auto;
             display: block;
-            margin: 0 auto -2px auto; /* Pegado al título */
+            margin: 0 auto -2px auto;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
@@ -558,6 +558,7 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
+    // Convertidor para la cabecera del conjuro (Soporta textos y símbolos ◆)
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
@@ -568,13 +569,13 @@
         if (t.includes('reacción') || t.includes('reaccion')) {
             return `<img src="./icons/reaction.png" class="pf-action-header-img" alt="Reacción" title="Reacción">`;
         }
-        if (t.includes('3') || t.includes('tres')) {
+        if (t.includes('3') || t.includes('tres') || t.includes('◆◆◆')) {
             return `<img src="./icons/three_action.png" class="pf-action-header-img" alt="3 Acciones" title="3 Acciones">`;
         }
-        if (t.includes('2') || t.includes('dos')) {
+        if (t.includes('2') || t.includes('dos') || t.includes('◆◆')) {
             return `<img src="./icons/two_action.png" class="pf-action-header-img" alt="2 Acciones" title="2 Acciones">`;
         }
-        if (t.includes('1') || t.includes('una')) {
+        if (t.includes('1') || t.includes('una') || t.includes('◆')) {
             return `<img src="./icons/single_action.png" class="pf-action-header-img" alt="1 Acción" title="1 Acción">`;
         }
         if (t.includes('variable')) {
@@ -588,6 +589,7 @@
         return accText;
     }
 
+    // Reemplaza referencias tanto en español como en inglés por los iconos
     function reemplazarIconosEnTexto(texto) {
         if (!esValido(texto)) return '';
         
@@ -599,14 +601,14 @@
         const imgReaction = `<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">`;
         const imgFree = `<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">`;
 
-        // Textos en Castellano
+        // 1. Textos en Castellano del manual
         resultado = resultado.replace(/Acción individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
         resultado = resultado.replace(/Dos acciones:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
         resultado = resultado.replace(/Tres acciones:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
         resultado = resultado.replace(/Reacción:/gi, `${imgReaction} <strong>Reacción:</strong>`);
         resultado = resultado.replace(/Acción libre:/gi, `${imgFree} <strong>Acción libre:</strong>`);
 
-        // Etiquetas en Inglés
+        // 2. Etiquetas en Inglés por si vienen del manual/Foundry
         resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
         resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
         resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
