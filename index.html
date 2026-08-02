@@ -210,8 +210,9 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 22px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            align-items: start;
         }
 
         /* TARJETA MAQUETADA SEGÚN MANUAL PF2E */
@@ -251,7 +252,7 @@
 
         .pf-title {
             font-family: 'Roboto Condensed', sans-serif;
-            font-size: 1.55rem;
+            font-size: 1.5rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -266,7 +267,7 @@
 
         .pf-rank-badge {
             font-family: 'Roboto Condensed', sans-serif;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--pf-dark);
@@ -302,15 +303,11 @@
             border-radius: 1px;
         }
 
-        .pf-trait-tradition {
-            background-color: #2b2b2b;
-        }
-
         /* LÍNEA 3: ESTADÍSTICAS EN TEXTO PLANO */
         .pf-stats-block {
-            font-size: 0.91rem;
+            font-size: 0.9rem;
             margin-bottom: 10px;
-            line-height: 1.45;
+            line-height: 1.4;
         }
 
         .pf-stats-line {
@@ -329,18 +326,56 @@
             margin: 10px 0;
         }
 
-        /* CUERPO Y POTENCIACIÓN */
-        .pf-description {
+        /* RESUMEN Y BOTÓN EXPANDIR */
+        .pf-summary {
             font-size: 0.92rem;
             color: var(--pf-dark);
-            flex-grow: 1;
+            margin-bottom: 6px;
+        }
+
+        /* BOTÓN DESPLEGABLE CON ICONO MÁS/MENOS */
+        .toggle-desc-btn {
+            background: none;
+            border: none;
+            color: var(--pf-burgundy);
+            font-family: 'Roboto Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 0;
+            margin-top: 4px;
+            transition: color 0.2s;
+        }
+
+        body.dark-mode .toggle-desc-btn {
+            color: var(--pf-gold);
+        }
+
+        .toggle-desc-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* CONTENIDO EXTENDIDO (OCULTO POR DEFECTO) */
+        .pf-expanded-content {
+            display: none;
+            margin-top: 10px;
+            font-size: 0.91rem;
+            line-height: 1.48;
+            border-top: 1px dashed var(--card-border);
+            padding-top: 10px;
+        }
+
+        .pf-description-full {
             white-space: pre-line;
             margin-bottom: 8px;
         }
 
         .pf-boost-block {
             font-size: 0.9rem;
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
         .pf-boost-label {
@@ -351,7 +386,7 @@
             font-size: 0.75rem;
             color: var(--text-muted);
             text-align: right;
-            margin-top: 6px;
+            margin-top: 8px;
             font-style: italic;
         }
 
@@ -477,7 +512,6 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
-    // Convertidor de texto de acciones a rombos ◆ oficiales de PF2e
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
@@ -488,6 +522,20 @@
         if (t.includes('variable')) return '◆ a ◆◆◆';
         if (t.includes('libre')) return '◇';
         return accText;
+    }
+
+    // Función global para expandir o colapsar el contenido completo
+    function toggleCardExpand(btn) {
+        const expandedContent = btn.nextElementSibling;
+        const isHidden = window.getComputedStyle(expandedContent).display === 'none';
+
+        if (isHidden) {
+            expandedContent.style.display = 'block';
+            btn.innerHTML = '➖ Ocultar detalles';
+        } else {
+            expandedContent.style.display = 'none';
+            btn.innerHTML = '➕ Ver descripción completa';
+        }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -570,28 +618,28 @@
                 const salvacion = getVal(item, 'Salvación');
                 const danoBase = getVal(item, 'Daño Base');
                 const tipoDano = getVal(item, 'Tipo de Daño');
-                const potenciacion = getVal(item, 'Potenciación');
                 
-                const descripcion = getVal(item, 'Descripción') || getVal(item, 'Efecto') || getVal(item, 'Resumen Efecto');
+                // Extraer el Resumen corto y la Descripción larga
+                const resumenEfecto = getVal(item, 'Resumen Efecto');
+                const descripcionLarga = getVal(item, 'Descripción') || getVal(item, 'Efecto');
+                const potenciacion = getVal(item, 'Potenciación') || getVal(item, 'Potenciado');
                 const fuente = getVal(item, 'Fuente');
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.setAttribute('data-name', `${nombre} ${nameEN}`);
-                card.setAttribute('data-desc', descripcion);
+                card.setAttribute('data-desc', `${resumenEfecto} ${descripcionLarga}`);
                 card.setAttribute('data-level', rango);
                 card.setAttribute('data-traits', rasgosRaw);
 
-                // Formato de Rango y Acciones
                 const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
                 const cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
                 const accionesIconos = formatearAcciones(accionesRaw);
 
-                // --- CAJAS DE RASGOS (ESTILO GRANATE Y DORADO) ---
+                // --- CAJAS DE RASGOS ---
                 const tagsVistos = new Set();
                 let rasgosCajasHTML = '';
 
-                // Rasgos del conjuro (Concentrar, Manipular...)
                 if (esValido(rasgosRaw)) {
                     rasgosRaw.split(',').forEach(r => {
                         const rClean = r.trim();
@@ -607,7 +655,7 @@
                     tagsVistos.add(categoria.toLowerCase());
                 }
 
-                // --- ESTADÍSTICAS EN TEXTO PLANO (ESTILO LIBRO) ---
+                // --- ESTADÍSTICAS EN TEXTO PLANO ---
                 let statsHTML = '';
                 
                 if (esValido(tradicionRaw)) {
@@ -633,13 +681,26 @@
                     statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Daño</span> ${danoBase} ${tipoDano}</div>`;
                 }
 
-                // --- SECCIÓN DE POTENCIACIÓN ---
-                let boostHTML = '';
-                if (esValido(potenciacion)) {
-                    boostHTML = `
-                        <hr class="pf-divider">
-                        <div class="pf-boost-block">
-                            <span class="pf-boost-label">Potenciado:</span> ${potenciacion}
+                // Lógica del Desplegable (Solo si hay Descripción larga o Potenciado)
+                let expandSectionHTML = '';
+                const tieneTextoExtra = esValido(descripcionLarga) || esValido(potenciacion);
+
+                if (tieneTextoExtra) {
+                    let boostHTML = '';
+                    if (esValido(potenciacion)) {
+                        boostHTML = `
+                            <hr class="pf-divider">
+                            <div class="pf-boost-block">
+                                <span class="pf-boost-label">Potenciado:</span> ${potenciacion}
+                            </div>
+                        `;
+                    }
+
+                    expandSectionHTML = `
+                        <button class="toggle-desc-btn" onclick="toggleCardExpand(this)">➕ Ver descripción completa</button>
+                        <div class="pf-expanded-content">
+                            ${esValido(descripcionLarga) ? `<div class="pf-description-full">${descripcionLarga}</div>` : ''}
+                            ${boostHTML}
                         </div>
                     `;
                 }
@@ -665,11 +726,11 @@
 
                         <hr class="pf-divider">
 
-                        <!-- Cuerpo: Descripción -->
-                        <div class="pf-description">${descripcion || ''}</div>
+                        <!-- Texto corto principal (Resumen Efecto) -->
+                        <div class="pf-summary">${resumenEfecto || ''}</div>
 
-                        <!-- Potenciado -->
-                        ${boostHTML}
+                        <!-- Sección desplegable con botón "+" -->
+                        ${expandSectionHTML}
                     </div>
 
                     ${fuente ? `<div class="pf-source-tag">${fuente}</div>` : ''}
