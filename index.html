@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compendio Mágico PF2e Remaster</title>
+    <title>Compendio Mágico (Remaster)</title>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Fuentes estilo Pathfinder / Paizo -->
@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto+Condensed:wght@400;700&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
-        /* MODO DÍA / CLARO (Fiel a la página del libro) */
+        /* MODO DÍA / CLARO */
         :root {
             --bg-color: #dfd8cc;           /* Fondo pergamino claro */
             --card-bg: #ffffff;           /* Tarjeta blanca */
@@ -38,6 +38,12 @@
             --header-bg: linear-gradient(180deg, #063d23 0%, #111813 100%);
         }
 
+        /* Invertir color de los iconos de acción en modo oscuro */
+        body.dark-mode .pf-action-img,
+        body.dark-mode .pf-action-header-img {
+            filter: invert(1) brightness(1.8);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -58,42 +64,42 @@
             margin: 0 auto;
         }
 
+        /* CABECERA COMPACTA Y AJUSTADA */
         header {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 25px 20px;
-            border-bottom: 3px solid var(--pf-gold);
-            margin-bottom: 25px;
+            padding: 14px 20px;
+            border-bottom: 2px solid var(--pf-gold);
+            margin-bottom: 20px;
             background: var(--header-bg);
             border-radius: 6px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
 
-        /* LOGO REESCALABLE RESPONSIVE */
+        /* LOGO REESCALABLE ACOMPASADO AL TEXTO */
         .pf-main-logo {
-            max-width: 380px;
-            width: 80%;
+            max-width: 310px;
+            width: 75%;
             height: auto;
             display: block;
-            margin: 0 auto 8px auto;
-            filter: drop-shadow(0px 2px 5px rgba(0,0,0,0.4));
-            transition: transform 0.2s;
+            margin: 0 auto -2px auto; /* Pegado al título */
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
         .theme-btn-top {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 12px;
+            right: 12px;
             background-color: rgba(255, 255, 255, 0.15);
             border: 1px solid var(--pf-gold);
             color: #ffffff;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -110,18 +116,13 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: #ffffff !important;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 2px;
+            line-height: 1;
+            margin-top: 0;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .subtitle {
-            font-size: 1.05rem;
-            color: var(--pf-gold);
-            font-style: italic;
         }
 
         .controls {
@@ -279,6 +280,7 @@
             vertical-align: middle;
             display: inline-block;
             margin: 0 2px;
+            transition: filter 0.3s;
         }
 
         .pf-action-header-img {
@@ -286,6 +288,7 @@
             width: auto;
             vertical-align: middle;
             display: inline-block;
+            transition: filter 0.3s;
         }
 
         .pf-actions-container {
@@ -454,19 +457,16 @@
             transform: translateY(-3px);
         }
 
-        /* Ajustes para pantallas pequeñas / móvil */
+        /* Ajustes para móvil */
         @media (max-width: 600px) {
             header {
-                padding: 20px 10px;
+                padding: 10px;
             }
             .pf-main-logo {
-                max-width: 260px;
+                max-width: 220px;
             }
             h1 {
-                font-size: 1.5rem;
-            }
-            .subtitle {
-                font-size: 0.9rem;
+                font-size: 1.35rem;
             }
         }
 
@@ -485,10 +485,9 @@
 <div class="container">
     <header>
         <div>
-            <!-- LOGO PF2e REESCALABLE -->
+            <!-- LOGO Y TÍTULO JUNTO Y COMPACTO -->
             <img src="./icons/PF2Logo.webp" alt="Pathfinder 2e Logo" class="pf-main-logo">
             <h1>Compendio Mágico</h1>
-            <div class="subtitle">Pathfinder 2ª Edición (Remaster)</div>
         </div>
 
         <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
@@ -559,7 +558,6 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
-    // Convertidor para la cabecera del conjuro
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
@@ -590,7 +588,6 @@
         return accText;
     }
 
-    // Reemplaza referencias tanto en español como en inglés por los iconos
     function reemplazarIconosEnTexto(texto) {
         if (!esValido(texto)) return '';
         
