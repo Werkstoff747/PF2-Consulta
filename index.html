@@ -17,8 +17,10 @@
             --bg-color: #dfd8cc;
             --card-bg: #ffffff;
             --card-border: #8c8375;
-            --pf-burgundy: #580c1f;
-            --pf-gold: #b58d3d;
+            --pf-burgundy: #580c1f;       /* Rojo granate para rasgos estándar */
+            --pf-uncommon: #8d4838;       /* Mantenido terracota claro oficial para Poco Común */
+            --pf-class: #063d23;          /* Verde bosque oficial para Clases */
+            --pf-gold: #b58d3d;           /* Borde dorado oficial */
             --pf-dark: #111111;
             --text-muted: #555555;
             --line-color: #222222;
@@ -31,6 +33,8 @@
             --card-bg: #181d19;
             --card-border: #38453c;
             --pf-burgundy: #6b1428;
+            --pf-uncommon: #9e4f3c;
+            --pf-class: #0d5432;
             --pf-gold: #c6a15a;
             --pf-dark: #e8e9e5;
             --text-muted: #a6b2a9;
@@ -141,7 +145,6 @@
             align-items: center;
         }
 
-        /* FILA DE CLASES DINÁMICA (Oculta por defecto) */
         .controls-row-class {
             display: none;
             padding-top: 8px;
@@ -201,7 +204,6 @@
             border-color: var(--pf-gold);
         }
 
-        /* Botones de clase en dorado suave */
         .class-btn.active {
             background-color: var(--pf-burgundy) !important;
             color: #ffffff !important;
@@ -329,6 +331,7 @@
             margin-bottom: 8px;
         }
 
+        /* LÍNEA 2: CAJAS DE RASGOS (TRAITS CON COLORES) */
         .pf-traits-row {
             display: flex;
             flex-wrap: wrap;
@@ -336,6 +339,7 @@
             margin-bottom: 10px;
         }
 
+        /* Estilo general de rasgo (Rojo granate) */
         .pf-trait-box {
             background-color: var(--pf-burgundy);
             color: #ffffff;
@@ -347,6 +351,16 @@
             padding: 1px 7px;
             letter-spacing: 0.5px;
             border-radius: 1px;
+        }
+
+        /* Rareza (Poco común / Raro): Terracota/Marrón claro */
+        .pf-trait-box.trait-uncommon {
+            background-color: var(--pf-uncommon);
+        }
+
+        /* Clases (Bardo, Clérigo, Druida, Mago, etc.): Verde Bosque */
+        .pf-trait-box.trait-class {
+            background-color: var(--pf-class);
         }
 
         .pf-stats-block {
@@ -504,7 +518,7 @@
                 <input type="text" id="searchInput" placeholder="Buscar por nombre, efecto, rasgos..." oninput="applyFilters()">
             </div>
             
-            <div class="filter-container">
+            <div class="filter-container" id="typeButtonsContainer">
                 <span class="filter-label">Tipo:</span>
                 <button class="filter-btn active" data-type="all" onclick="filterType('all')">Todos</button>
                 <button class="filter-btn" data-type="conjuro" onclick="filterType('conjuro')">Conjuros</button>
@@ -533,7 +547,7 @@
             </div>
         </div>
 
-        <!-- FILA DINÁMICA DE CLASES (Se muestra solo al seleccionar Conjuros de Foco) -->
+        <!-- FILA DINÁMICA DE CLASES -->
         <div class="controls-row-class" id="classFilterRow">
             <div class="filter-container">
                 <span class="filter-label">Clase:</span>
@@ -570,6 +584,9 @@
     let currentLevel = 'all';
     let currentType = 'all';
     let currentClass = 'all';
+
+    const CLASES_LISTA = ["bardo", "clérigo", "clerigo", "druida", "explorador", "brujo", "mago", "campeón", "campeon", "monje", "hechicero", "psíquico", "psiquico", "oráculo", "oraculo", "alquimista", "inventor", "swashbuckler", "barbaro", "bárbaro", "guerrero", "pícaro", "picaro"];
+    const RAREZAS_LISTA = ["poco común", "poco comun", "uncommon", "raro", "rare", "único", "unico", "unique"];
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
@@ -735,6 +752,7 @@
                 const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
                 const fuente = getVal(item, 'Fuente');
 
+                // Clasificación flexible de tipo (Conjuro, Conjuro de Foco, Ritual)
                 let tipoNormalizado = 'conjuro';
                 const catLower = categoria.toLowerCase();
                 const rasgosLower = rasgosRaw.toLowerCase();
@@ -764,22 +782,35 @@
 
                 const accionesHTML = formatearAcciones(accionesRaw);
 
+                // --- GENERACIÓN DE CAJAS DE RASGOS CON COLORES ---
                 const tagsVistos = new Set();
                 let rasgosCajasHTML = '';
 
-                if (esValido(rasgosRaw)) {
-                    rasgosRaw.split(',').forEach(r => {
-                        const rClean = r.trim();
-                        if (rClean && !tagsVistos.has(rClean.toLowerCase())) {
-                            rasgosCajasHTML += `<span class="pf-trait-box">${rClean}</span>`;
-                            tagsVistos.add(rClean.toLowerCase());
+                const agregarTag = (rClean) => {
+                    if (!rClean) return;
+                    const rLower = rClean.toLowerCase().trim();
+                    if (!tagsVistos.has(rLower)) {
+                        tagsVistos.add(rLower);
+
+                        let extraClass = '';
+                        // Asignar clase de Rareza (Poco común / Raro)
+                        if (RAREZAS_LISTA.some(rar => rLower.includes(rar))) {
+                            extraClass = 'trait-uncommon';
                         }
-                    });
+                        // Asignar clase de Clase (Bardo, Clérigo, Druida, Mago, etc.)
+                        else if (CLASES_LISTA.some(cls => rLower.includes(cls))) {
+                            extraClass = 'trait-class';
+                        }
+
+                        rasgosCajasHTML += `<span class="pf-trait-box ${extraClass}">${rClean}</span>`;
+                    }
+                };
+
+                if (esValido(rasgosRaw)) {
+                    rasgosRaw.split(',').forEach(r => agregarTag(r.trim()));
                 }
-                
-                if (esValido(categoria) && !tagsVistos.has(categoria.toLowerCase())) {
-                    rasgosCajasHTML += `<span class="pf-trait-box">${categoria}</span>`;
-                    tagsVistos.add(categoria.toLowerCase());
+                if (esValido(categoria)) {
+                    agregarTag(categoria.trim());
                 }
 
                 let statsHTML = '';
@@ -874,17 +905,21 @@
 
     function filterType(type) {
         currentType = type;
-        document.querySelectorAll('.filter-container .filter-btn:not(.level-btn):not(.class-btn)').forEach(btn => {
+        
+        const typeButtons = document.querySelectorAll('#typeButtonsContainer .filter-btn');
+        typeButtons.forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-type') === type);
         });
 
-        // Mostrar u ocultar la fila de clases si se pulsa "Conjuros de Foco"
         const classRow = document.getElementById('classFilterRow');
         if (type === 'foco') {
             classRow.style.display = 'flex';
         } else {
             classRow.style.display = 'none';
-            filterClass('all'); // Resetear filtro de clase al salir de foco
+            currentClass = 'all';
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-class') === 'all');
+            });
         }
 
         applyFilters();
@@ -900,9 +935,23 @@
 
     function clearAllFilters() {
         document.getElementById('searchInput').value = '';
-        filterType('all');
-        filterLevel('all');
-        filterClass('all');
+        currentType = 'all';
+        currentLevel = 'all';
+        currentClass = 'all';
+
+        document.querySelectorAll('#typeButtonsContainer .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-type') === 'all');
+        });
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-level') === 'all');
+        });
+        document.querySelectorAll('.class-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-class') === 'all');
+        });
+
+        document.getElementById('classFilterRow').style.display = 'none';
+
+        applyFilters();
     }
 
     function applyFilters() {
@@ -926,7 +975,6 @@
                 const matchesLevel = (currentLevel === 'all' || level.trim() === currentLevel || (currentLevel === '0' && level.includes('truco')));
                 const matchesType = (currentType === 'all' || type === currentType);
                 
-                // Filtro por clase (solo cuando estamos en conjuros de foco)
                 const matchesClass = (currentClass === 'all' || traits.includes(currentClass) || text.includes(currentClass));
 
                 if (matchesSearch && matchesLevel && matchesType && matchesClass) {
