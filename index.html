@@ -134,11 +134,24 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .controls-row-top, .controls-row-type {
+        .controls-row-top, .controls-row-type, .controls-row-class {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             align-items: center;
+        }
+
+        /* FILA DE CLASES DINÁMICA (Oculta por defecto) */
+        .controls-row-class {
+            display: none;
+            padding-top: 8px;
+            border-top: 1px dashed var(--card-border);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .search-box {
@@ -179,12 +192,20 @@
             font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .filter-btn:hover, .filter-btn.active {
             background-color: #063d23;
             color: #ffffff;
             border-color: var(--pf-gold);
+        }
+
+        /* Botones de clase en dorado suave */
+        .class-btn.active {
+            background-color: var(--pf-burgundy) !important;
+            color: #ffffff !important;
+            border-color: var(--pf-gold) !important;
         }
 
         .clear-btn {
@@ -511,6 +532,24 @@
                 <button class="filter-btn level-btn" data-level="10" onclick="filterLevel('10')">10</button>
             </div>
         </div>
+
+        <!-- FILA DINÁMICA DE CLASES (Se muestra solo al seleccionar Conjuros de Foco) -->
+        <div class="controls-row-class" id="classFilterRow">
+            <div class="filter-container">
+                <span class="filter-label">Clase:</span>
+                <button class="filter-btn class-btn active" data-class="all" onclick="filterClass('all')">Todas</button>
+                <button class="filter-btn class-btn" data-class="bardo" onclick="filterClass('bardo')">Bardo</button>
+                <button class="filter-btn class-btn" data-class="clérigo" onclick="filterClass('clérigo')">Clérigo</button>
+                <button class="filter-btn class-btn" data-class="druida" onclick="filterClass('druida')">Druida</button>
+                <button class="filter-btn class-btn" data-class="explorador" onclick="filterClass('explorador')">Explorador</button>
+                <button class="filter-btn class-btn" data-class="brujo" onclick="filterClass('brujo')">Brujo</button>
+                <button class="filter-btn class-btn" data-class="mago" onclick="filterClass('mago')">Mago</button>
+                <button class="filter-btn class-btn" data-class="campeón" onclick="filterClass('campeón')">Campeón</button>
+                <button class="filter-btn class-btn" data-class="monje" onclick="filterClass('monje')">Monje</button>
+                <button class="filter-btn class-btn" data-class="hechicero" onclick="filterClass('hechicero')">Hechicero</button>
+                <button class="filter-btn class-btn" data-class="psíquico" onclick="filterClass('psíquico')">Psíquico</button>
+            </div>
+        </div>
     </div>
 
     <div id="resultsCounter" class="results-counter"></div>
@@ -530,6 +569,7 @@
     let datosGlobales = [];
     let currentLevel = 'all';
     let currentType = 'all';
+    let currentClass = 'all';
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
@@ -695,7 +735,6 @@
                 const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
                 const fuente = getVal(item, 'Fuente');
 
-                // Clasificación según manual (Conjuro, Conjuro de Foco, Ritual)
                 let tipoNormalizado = 'conjuro';
                 const catLower = categoria.toLowerCase();
                 const rasgosLower = rasgosRaw.toLowerCase();
@@ -714,7 +753,6 @@
                 card.setAttribute('data-traits', rasgosRaw);
                 card.setAttribute('data-type', tipoNormalizado);
 
-                // Formato idéntico al manual para la esquina superior derecha
                 const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
                 let cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
 
@@ -836,8 +874,26 @@
 
     function filterType(type) {
         currentType = type;
-        document.querySelectorAll('.filter-container .filter-btn:not(.level-btn)').forEach(btn => {
+        document.querySelectorAll('.filter-container .filter-btn:not(.level-btn):not(.class-btn)').forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-type') === type);
+        });
+
+        // Mostrar u ocultar la fila de clases si se pulsa "Conjuros de Foco"
+        const classRow = document.getElementById('classFilterRow');
+        if (type === 'foco') {
+            classRow.style.display = 'flex';
+        } else {
+            classRow.style.display = 'none';
+            filterClass('all'); // Resetear filtro de clase al salir de foco
+        }
+
+        applyFilters();
+    }
+
+    function filterClass(className) {
+        currentClass = className;
+        document.querySelectorAll('.class-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-class') === className);
         });
         applyFilters();
     }
@@ -846,6 +902,7 @@
         document.getElementById('searchInput').value = '';
         filterType('all');
         filterLevel('all');
+        filterClass('all');
     }
 
     function applyFilters() {
@@ -868,8 +925,11 @@
                 const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query) || text.includes(query);
                 const matchesLevel = (currentLevel === 'all' || level.trim() === currentLevel || (currentLevel === '0' && level.includes('truco')));
                 const matchesType = (currentType === 'all' || type === currentType);
+                
+                // Filtro por clase (solo cuando estamos en conjuros de foco)
+                const matchesClass = (currentClass === 'all' || traits.includes(currentClass) || text.includes(currentClass));
 
-                if (matchesSearch && matchesLevel && matchesType) {
+                if (matchesSearch && matchesLevel && matchesType && matchesClass) {
                     card.style.display = 'flex';
                     visibleCardsInSection++;
                     totalVisibleCards++;
