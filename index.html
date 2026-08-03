@@ -18,7 +18,7 @@
             --card-bg: #ffffff;
             --card-border: #8c8375;
             --pf-burgundy: #580c1f;       /* Rojo granate para rasgos estándar */
-            --pf-uncommon: #8d4838;       /* Mantenido terracota claro oficial para Poco Común */
+            --pf-uncommon: #8d4838;       /* Terracota claro oficial para Poco Común */
             --pf-class: #063d23;          /* Verde bosque oficial para Clases */
             --pf-gold: #b58d3d;           /* Borde dorado oficial */
             --pf-dark: #111111;
@@ -331,7 +331,6 @@
             margin-bottom: 8px;
         }
 
-        /* LÍNEA 2: CAJAS DE RASGOS (TRAITS CON COLORES) */
         .pf-traits-row {
             display: flex;
             flex-wrap: wrap;
@@ -339,7 +338,6 @@
             margin-bottom: 10px;
         }
 
-        /* Estilo general de rasgo (Rojo granate) */
         .pf-trait-box {
             background-color: var(--pf-burgundy);
             color: #ffffff;
@@ -353,12 +351,10 @@
             border-radius: 1px;
         }
 
-        /* Rareza (Poco común / Raro): Terracota/Marrón claro */
         .pf-trait-box.trait-uncommon {
             background-color: var(--pf-uncommon);
         }
 
-        /* Clases (Bardo, Clérigo, Druida, Mago, etc.): Verde Bosque */
         .pf-trait-box.trait-class {
             background-color: var(--pf-class);
         }
@@ -752,14 +748,17 @@
                 const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
                 const fuente = getVal(item, 'Fuente');
 
-                // Clasificación flexible de tipo (Conjuro, Conjuro de Foco, Ritual)
+                // Clasificación flexible que detecta Conjuro de Foco y Truco de Foco
                 let tipoNormalizado = 'conjuro';
                 const catLower = categoria.toLowerCase();
                 const rasgosLower = rasgosRaw.toLowerCase();
 
-                if (catLower.includes('foco') || rasgosLower.includes('foco')) {
+                const esFoco = catLower.includes('foco') || rasgosLower.includes('foco') || catLower.includes('composición') || rasgosLower.includes('composición') || rasgosLower.includes('composicion');
+                const esRitual = catLower.includes('ritual') || rasgosLower.includes('ritual');
+
+                if (esFoco) {
                     tipoNormalizado = 'foco';
-                } else if (catLower.includes('ritual') || rasgosLower.includes('ritual')) {
+                } else if (esRitual) {
                     tipoNormalizado = 'ritual';
                 }
 
@@ -775,14 +774,13 @@
                 let cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
 
                 if (tipoNormalizado === 'foco') {
-                    cabeceraRangoText = `CONJURO DE FOCO ${rango}`;
+                    cabeceraRangoText = esTruco ? `TRUCO DE FOCO 0` : `CONJURO DE FOCO ${rango}`;
                 } else if (tipoNormalizado === 'ritual') {
                     cabeceraRangoText = `RITUAL ${rango}`;
                 }
 
                 const accionesHTML = formatearAcciones(accionesRaw);
 
-                // --- GENERACIÓN DE CAJAS DE RASGOS CON COLORES ---
                 const tagsVistos = new Set();
                 let rasgosCajasHTML = '';
 
@@ -793,12 +791,9 @@
                         tagsVistos.add(rLower);
 
                         let extraClass = '';
-                        // Asignar clase de Rareza (Poco común / Raro)
                         if (RAREZAS_LISTA.some(rar => rLower.includes(rar))) {
                             extraClass = 'trait-uncommon';
-                        }
-                        // Asignar clase de Clase (Bardo, Clérigo, Druida, Mago, etc.)
-                        else if (CLASES_LISTA.some(cls => rLower.includes(cls))) {
+                        } else if (CLASES_LISTA.some(cls => rLower.includes(cls))) {
                             extraClass = 'trait-class';
                         }
 
