@@ -204,6 +204,12 @@
             border-color: var(--pf-gold);
         }
 
+        .sort-az-btn {
+            background-color: var(--pf-burgundy) !important;
+            color: #ffffff !important;
+            border-color: var(--pf-gold) !important;
+        }
+
         .class-btn.active {
             background-color: var(--pf-burgundy) !important;
             color: #ffffff !important;
@@ -527,9 +533,10 @@
 
         <div class="controls-row-type">
             <div class="filter-container">
-                <span class="filter-label">Rango:</span>
+                <span class="filter-label">Rango / Orden:</span>
                 <button class="filter-btn level-btn active" data-level="all" onclick="filterLevel('all')">Todos</button>
-                <button class="filter-btn level-btn" data-level="0" onclick="filterLevel('0')">Trucos</button>
+                <button class="filter-btn level-btn sort-az-btn" data-level="az" onclick="filterLevel('az')" title="Orden Alfabético del Manual">🔤 A-Z</button>
+                <button class="filter-btn level-btn" data-level="trucos" onclick="filterLevel('trucos')">Trucos</button>
                 <button class="filter-btn level-btn" data-level="1" onclick="filterLevel('1')">1</button>
                 <button class="filter-btn level-btn" data-level="2" onclick="filterLevel('2')">2</button>
                 <button class="filter-btn level-btn" data-level="3" onclick="filterLevel('3')">3</button>
@@ -694,18 +701,193 @@
         });
     });
 
+    function crearTarjetaHTML(item) {
+        const nombre = getVal(item, 'Nombre');
+        const nameEN = getVal(item, 'Name (EN)');
+        const categoria = getVal(item, 'Categoría');
+        const rango = getVal(item, 'Rango') || '1';
+        const tradicionRaw = getVal(item, 'Tradición');
+        const accionesRaw = getVal(item, 'Acciones');
+        const rasgosRaw = getVal(item, 'Rasgos');
+        const alcance = getVal(item, 'Alcance');
+        const areaObjetivo = getVal(item, 'Área/Objetivo');
+        const duracion = getVal(item, 'Duración');
+        const salvacion = getVal(item, 'Salvación');
+        const danoBase = getVal(item, 'Daño Base');
+        const tipoDano = getVal(item, 'Tipo de Daño');
+        
+        const resumenEfecto = reemplazarIconosEnTexto(getVal(item, 'Resumen Efecto'));
+        const descripcionLarga = reemplazarIconosEnTexto(getVal(item, 'Descripción') || getVal(item, 'Efecto'));
+        const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
+        const fuente = getVal(item, 'Fuente');
+
+        let tipoNormalizado = 'conjuro';
+        const catLower = categoria.toLowerCase();
+        const rasgosLower = rasgosRaw.toLowerCase();
+
+        const esTruco = catLower.includes('truco') || rasgosLower.includes('truco') || rango === '0';
+        const esFoco = catLower.includes('foco') || rasgosLower.includes('foco') || catLower.includes('composición') || rasgosLower.includes('composición') || rasgosLower.includes('composicion');
+        const esRitual = catLower.includes('ritual') || rasgosLower.includes('ritual');
+
+        if (esFoco) {
+            tipoNormalizado = 'foco';
+        } else if (esRitual) {
+            tipoNormalizado = 'ritual';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('data-name', `${nombre} ${nameEN}`);
+        card.setAttribute('data-desc', `${resumenEfecto} ${descripcionLarga}`);
+        card.setAttribute('data-level', rango);
+        card.setAttribute('data-traits', rasgosRaw);
+        card.setAttribute('data-type', tipoNormalizado);
+        card.setAttribute('data-istruco', esTruco ? 'true' : 'false');
+
+        let cabeceraRangoText = esTruco ? `TRUCO ${rango}` : `CONJURO ${rango}`;
+
+        if (tipoNormalizado === 'foco') {
+            cabeceraRangoText = esTruco ? `TRUCO DE FOCO ${rango}` : `CONJURO DE FOCO ${rango}`;
+        } else if (tipoNormalizado === 'ritual') {
+            cabeceraRangoText = `RITUAL ${rango}`;
+        }
+
+        const accionesHTML = formatearAcciones(accionesRaw);
+
+        const tagsVistos = new Set();
+        let rasgosCajasHTML = '';
+
+        const agregarTag = (rClean) => {
+            if (!rClean) return;
+            const rLower = rClean.toLowerCase().trim();
+            if (!tagsVistos.has(rLower)) {
+                tagsVistos.add(rLower);
+
+                let extraClass = '';
+                if (RAREZAS_LISTA.some(rar => rLower.includes(rar))) {
+                    extraClass = 'trait-uncommon';
+                } else if (CLASES_LISTA.some(cls => rLower.includes(cls))) {
+                    extraClass = 'trait-class';
+                }
+
+                rasgosCajasHTML += `<span class="pf-trait-box ${extraClass}">${rClean}</span>`;
+            }
+        };
+
+        if (esValido(rasgosRaw)) {
+            rasgosRaw.split(',').forEach(r => agregarTag(r.trim()));
+        }
+        if (esValido(categoria)) {
+            agregarTag(categoria.trim());
+        }
+
+        let statsHTML = '';
+        if (esValido(tradicionRaw)) {
+            statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Tradiciones</span> ${tradicionRaw}</div>`;
+        }
+
+        let lineaDistanciaObj = [];
+        if (esValido(alcance)) lineaDistanciaObj.push(`<span class="pf-stats-label">Rango de distancia</span> ${alcance}`);
+        if (esValido(areaObjetivo)) lineaDistanciaObj.push(`<span class="pf-stats-label">Objetivos</span> ${areaObjetivo}`);
+        if (lineaDistanciaObj.length > 0) {
+            statsHTML += `<div class="pf-stats-line">${lineaDistanciaObj.join('; ')}</div>`;
+        }
+
+        if (esValido(duracion)) {
+            statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Duración</span> ${duracion}</div>`;
+        }
+
+        if (esValido(salvacion)) {
+            statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Salvación</span> ${salvacion}</div>`;
+        }
+
+        if (esValido(danoBase) || esValido(tipoDano)) {
+            statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Daño</span> ${danoBase} ${tipoDano}</div>`;
+        }
+
+        let expandSectionHTML = '';
+        const tieneTextoExtra = esValido(descripcionLarga) || esValido(potenciacion);
+
+        if (tieneTextoExtra) {
+            let boostHTML = '';
+            if (esValido(potenciacion)) {
+                boostHTML = `
+                    <hr class="pf-divider">
+                    <div class="pf-boost-block">
+                        <span class="pf-boost-label">Potenciado:</span> ${potenciacion}
+                    </div>
+                `;
+            }
+
+            expandSectionHTML = `
+                <button class="toggle-desc-btn" onclick="toggleCardExpand(this)">➕ Ver descripción completa</button>
+                <div class="pf-expanded-content">
+                    ${esValido(descripcionLarga) ? `<div class="pf-description-full">${descripcionLarga}</div>` : ''}
+                    ${boostHTML}
+                </div>
+            `;
+        }
+
+        card.innerHTML = `
+            <div>
+                <div class="pf-header-row">
+                    <div class="pf-title-container">
+                        <span class="pf-title">${nombre || 'Sin Nombre'}</span>
+                        ${accionesHTML ? `${accionesHTML}` : ''}
+                    </div>
+                    <span class="pf-rank-badge">${cabeceraRangoText}</span>
+                </div>
+                
+                ${nameEN ? `<div class="pf-name-en">(${nameEN})</div>` : ''}
+
+                ${rasgosCajasHTML ? `<div class="pf-traits-row">${rasgosCajasHTML}</div>` : ''}
+
+                ${statsHTML ? `<div class="pf-stats-block">${statsHTML}</div>` : ''}
+
+                <hr class="pf-divider">
+
+                <div class="pf-summary">${resumenEfecto || ''}</div>
+
+                ${expandSectionHTML}
+            </div>
+
+            ${fuente ? `<div class="pf-source-tag">${fuente}</div>` : ''}
+        `;
+
+        return card;
+    }
+
     function renderizarCompendio(datos) {
         const wrapper = document.getElementById('disciplinesWrapper');
         wrapper.innerHTML = '';
 
+        // MODO A-Z: Muestra una única lista alfabética sin cabeceras por rango
+        if (currentLevel === 'az') {
+            const sec = document.createElement('div');
+            sec.className = 'discipline-section';
+            sec.innerHTML = `<h2 class="section-title">Índice Alfabético (A - Z)</h2><div class="grid"></div>`;
+            const grid = sec.querySelector('.grid');
+
+            const datosOrdenados = [...datos].sort((a, b) => {
+                const nomA = getVal(a, 'Nombre').toLowerCase();
+                const nomB = getVal(b, 'Nombre').toLowerCase();
+                return nomA.localeCompare(nomB, 'es', { sensitivity: 'base' });
+            });
+
+            datosOrdenados.forEach(item => {
+                grid.appendChild(crearTarjetaHTML(item));
+            });
+
+            wrapper.appendChild(sec);
+            applyFilters();
+            return;
+        }
+
+        // MODO POR RANGOS: Agrupa por Rango N
         const agrupados = {};
         datos.forEach(row => {
             const rangoRaw = getVal(row, 'Rango') || '1';
             let claveAgrupacion = 'Conjuros de Rango ' + rangoRaw;
-            
-            if (rangoRaw === '0' || rangoRaw.toLowerCase().includes('truco')) {
-                claveAgrupacion = 'Trucos (Rango 0)';
-            }
 
             if (!agrupados[claveAgrupacion]) agrupados[claveAgrupacion] = [];
             agrupados[claveAgrupacion].push(row);
@@ -729,159 +911,7 @@
             const grid = sec.querySelector('.grid');
 
             agrupados[grupo].forEach(item => {
-                const nombre = getVal(item, 'Nombre');
-                const nameEN = getVal(item, 'Name (EN)');
-                const categoria = getVal(item, 'Categoría');
-                const rango = getVal(item, 'Rango') || '1';
-                const tradicionRaw = getVal(item, 'Tradición');
-                const accionesRaw = getVal(item, 'Acciones');
-                const rasgosRaw = getVal(item, 'Rasgos');
-                const alcance = getVal(item, 'Alcance');
-                const areaObjetivo = getVal(item, 'Área/Objetivo');
-                const duracion = getVal(item, 'Duración');
-                const salvacion = getVal(item, 'Salvación');
-                const danoBase = getVal(item, 'Daño Base');
-                const tipoDano = getVal(item, 'Tipo de Daño');
-                
-                const resumenEfecto = reemplazarIconosEnTexto(getVal(item, 'Resumen Efecto'));
-                const descripcionLarga = reemplazarIconosEnTexto(getVal(item, 'Descripción') || getVal(item, 'Efecto'));
-                const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
-                const fuente = getVal(item, 'Fuente');
-
-                // Clasificación flexible que detecta Conjuro de Foco y Truco de Foco
-                let tipoNormalizado = 'conjuro';
-                const catLower = categoria.toLowerCase();
-                const rasgosLower = rasgosRaw.toLowerCase();
-
-                const esFoco = catLower.includes('foco') || rasgosLower.includes('foco') || catLower.includes('composición') || rasgosLower.includes('composición') || rasgosLower.includes('composicion');
-                const esRitual = catLower.includes('ritual') || rasgosLower.includes('ritual');
-
-                if (esFoco) {
-                    tipoNormalizado = 'foco';
-                } else if (esRitual) {
-                    tipoNormalizado = 'ritual';
-                }
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.setAttribute('data-name', `${nombre} ${nameEN}`);
-                card.setAttribute('data-desc', `${resumenEfecto} ${descripcionLarga}`);
-                card.setAttribute('data-level', rango);
-                card.setAttribute('data-traits', rasgosRaw);
-                card.setAttribute('data-type', tipoNormalizado);
-
-                const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
-                let cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
-
-                if (tipoNormalizado === 'foco') {
-                    cabeceraRangoText = esTruco ? `TRUCO DE FOCO 0` : `CONJURO DE FOCO ${rango}`;
-                } else if (tipoNormalizado === 'ritual') {
-                    cabeceraRangoText = `RITUAL ${rango}`;
-                }
-
-                const accionesHTML = formatearAcciones(accionesRaw);
-
-                const tagsVistos = new Set();
-                let rasgosCajasHTML = '';
-
-                const agregarTag = (rClean) => {
-                    if (!rClean) return;
-                    const rLower = rClean.toLowerCase().trim();
-                    if (!tagsVistos.has(rLower)) {
-                        tagsVistos.add(rLower);
-
-                        let extraClass = '';
-                        if (RAREZAS_LISTA.some(rar => rLower.includes(rar))) {
-                            extraClass = 'trait-uncommon';
-                        } else if (CLASES_LISTA.some(cls => rLower.includes(cls))) {
-                            extraClass = 'trait-class';
-                        }
-
-                        rasgosCajasHTML += `<span class="pf-trait-box ${extraClass}">${rClean}</span>`;
-                    }
-                };
-
-                if (esValido(rasgosRaw)) {
-                    rasgosRaw.split(',').forEach(r => agregarTag(r.trim()));
-                }
-                if (esValido(categoria)) {
-                    agregarTag(categoria.trim());
-                }
-
-                let statsHTML = '';
-                if (esValido(tradicionRaw)) {
-                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Tradiciones</span> ${tradicionRaw}</div>`;
-                }
-
-                let lineaDistanciaObj = [];
-                if (esValido(alcance)) lineaDistanciaObj.push(`<span class="pf-stats-label">Rango de distancia</span> ${alcance}`);
-                if (esValido(areaObjetivo)) lineaDistanciaObj.push(`<span class="pf-stats-label">Objetivos</span> ${areaObjetivo}`);
-                if (lineaDistanciaObj.length > 0) {
-                    statsHTML += `<div class="pf-stats-line">${lineaDistanciaObj.join('; ')}</div>`;
-                }
-
-                if (esValido(duracion)) {
-                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Duración</span> ${duracion}</div>`;
-                }
-
-                if (esValido(salvacion)) {
-                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Salvación</span> ${salvacion}</div>`;
-                }
-
-                if (esValido(danoBase) || esValido(tipoDano)) {
-                    statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Daño</span> ${danoBase} ${tipoDano}</div>`;
-                }
-
-                let expandSectionHTML = '';
-                const tieneTextoExtra = esValido(descripcionLarga) || esValido(potenciacion);
-
-                if (tieneTextoExtra) {
-                    let boostHTML = '';
-                    if (esValido(potenciacion)) {
-                        boostHTML = `
-                            <hr class="pf-divider">
-                            <div class="pf-boost-block">
-                                <span class="pf-boost-label">Potenciado:</span> ${potenciacion}
-                            </div>
-                        `;
-                    }
-
-                    expandSectionHTML = `
-                        <button class="toggle-desc-btn" onclick="toggleCardExpand(this)">➕ Ver descripción completa</button>
-                        <div class="pf-expanded-content">
-                            ${esValido(descripcionLarga) ? `<div class="pf-description-full">${descripcionLarga}</div>` : ''}
-                            ${boostHTML}
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div>
-                        <div class="pf-header-row">
-                            <div class="pf-title-container">
-                                <span class="pf-title">${nombre || 'Sin Nombre'}</span>
-                                ${accionesHTML ? `${accionesHTML}` : ''}
-                            </div>
-                            <span class="pf-rank-badge">${cabeceraRangoText}</span>
-                        </div>
-                        
-                        ${nameEN ? `<div class="pf-name-en">(${nameEN})</div>` : ''}
-
-                        ${rasgosCajasHTML ? `<div class="pf-traits-row">${rasgosCajasHTML}</div>` : ''}
-
-                        ${statsHTML ? `<div class="pf-stats-block">${statsHTML}</div>` : ''}
-
-                        <hr class="pf-divider">
-
-                        <div class="pf-summary">${resumenEfecto || ''}</div>
-
-                        ${expandSectionHTML}
-                    </div>
-
-                    ${fuente ? `<div class="pf-source-tag">${fuente}</div>` : ''}
-                `;
-
-                grid.appendChild(card);
+                grid.appendChild(crearTarjetaHTML(item));
             });
 
             wrapper.appendChild(sec);
@@ -895,7 +925,9 @@
         document.querySelectorAll('.level-btn').forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-level') === level);
         });
-        applyFilters();
+
+        // Si cambia entre A-Z y Rangos, vuelve a renderizar la cuadrícula
+        renderizarCompendio(datosGlobales);
     }
 
     function filterType(type) {
@@ -946,7 +978,7 @@
 
         document.getElementById('classFilterRow').style.display = 'none';
 
-        applyFilters();
+        renderizarCompendio(datosGlobales);
     }
 
     function applyFilters() {
@@ -964,12 +996,22 @@
                 const traits = card.getAttribute('data-traits').toLowerCase();
                 const level = card.getAttribute('data-level').toLowerCase();
                 const type = card.getAttribute('data-type').toLowerCase();
+                const isTruco = card.getAttribute('data-istruco') === 'true';
                 const text = card.textContent.toLowerCase();
 
                 const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query) || text.includes(query);
-                const matchesLevel = (currentLevel === 'all' || level.trim() === currentLevel || (currentLevel === '0' && level.includes('truco')));
-                const matchesType = (currentType === 'all' || type === currentType);
                 
+                // Filtro de Nivel/Rango
+                let matchesLevel = false;
+                if (currentLevel === 'all' || currentLevel === 'az') {
+                    matchesLevel = true;
+                } else if (currentLevel === 'trucos') {
+                    matchesLevel = isTruco;
+                } else {
+                    matchesLevel = (level.trim() === currentLevel);
+                }
+
+                const matchesType = (currentType === 'all' || type === currentType);
                 const matchesClass = (currentClass === 'all' || traits.includes(currentClass) || text.includes(currentClass));
 
                 if (matchesSearch && matchesLevel && matchesType && matchesClass) {
