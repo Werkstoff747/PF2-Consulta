@@ -14,15 +14,15 @@
     <style>
         /* MODO DÍA / CLARO */
         :root {
-            --bg-color: #dfd8cc;           /* Fondo pergamino claro */
-            --card-bg: #ffffff;           /* Tarjeta blanca */
-            --card-border: #8c8375;       /* Borde suave */
-            --pf-burgundy: #580c1f;       /* Rojo granate oficial de rasgos */
-            --pf-gold: #b58d3d;           /* Borde dorado de rasgos */
-            --pf-dark: #111111;           /* Texto negro */
-            --text-muted: #555555;        /* Subtítulos */
-            --line-color: #222222;        /* Líneas divisorias impresas */
-            --header-bg: #063d23;         /* Verde bosque para la cabecera */
+            --bg-color: #dfd8cc;
+            --card-bg: #ffffff;
+            --card-border: #8c8375;
+            --pf-burgundy: #580c1f;
+            --pf-gold: #b58d3d;
+            --pf-dark: #111111;
+            --text-muted: #555555;
+            --line-color: #222222;
+            --header-bg: #063d23;
         }
 
         /* MODO NOCHE / OSCURO */
@@ -38,7 +38,6 @@
             --header-bg: linear-gradient(180deg, #063d23 0%, #111813 100%);
         }
 
-        /* Invertir color de los iconos de acción en modo oscuro para legibilidad */
         body.dark-mode .pf-action-img,
         body.dark-mode .pf-action-header-img {
             filter: invert(1) brightness(1.8);
@@ -64,7 +63,6 @@
             margin: 0 auto;
         }
 
-        /* CABECERA COMPACTA Y AJUSTADA */
         header {
             position: relative;
             display: flex;
@@ -79,7 +77,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
 
-        /* LOGO REESCALABLE ACOMPASADO AL TEXTO */
         .pf-main-logo {
             max-width: 310px;
             width: 75%;
@@ -137,7 +134,7 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .controls-row-top {
+        .controls-row-top, .controls-row-type {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
@@ -160,20 +157,20 @@
             outline: none;
         }
 
-        .level-filter-container {
+        .filter-container {
             display: flex;
             align-items: center;
             gap: 5px;
             flex-wrap: wrap;
         }
 
-        .level-label {
+        .filter-label {
             font-size: 0.85rem;
             font-weight: 700;
             margin-right: 4px;
         }
 
-        .level-btn {
+        .filter-btn {
             padding: 4px 9px;
             border-radius: 3px;
             background-color: var(--bg-color);
@@ -184,7 +181,7 @@
             cursor: pointer;
         }
 
-        .level-btn:hover, .level-btn.active {
+        .filter-btn:hover, .filter-btn.active {
             background-color: #063d23;
             color: #ffffff;
             border-color: var(--pf-gold);
@@ -229,7 +226,6 @@
             align-items: start;
         }
 
-        /* TARJETA MAQUETADA SEGÚN MANUAL PF2E */
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -247,7 +243,6 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
 
-        /* LÍNEA 1: CABECERA CONJURO */
         .pf-header-row {
             display: flex;
             justify-content: space-between;
@@ -273,7 +268,6 @@
             color: var(--pf-dark);
         }
 
-        /* ICONOS DE ACCIÓN */
         .pf-action-img {
             height: 18px;
             width: auto;
@@ -314,7 +308,6 @@
             margin-bottom: 8px;
         }
 
-        /* LÍNEA 2: CAJAS DE RASGOS (TRAITS) */
         .pf-traits-row {
             display: flex;
             flex-wrap: wrap;
@@ -335,7 +328,6 @@
             border-radius: 1px;
         }
 
-        /* LÍNEA 3: ESTADÍSTICAS EN TEXTO PLANO */
         .pf-stats-block {
             font-size: 0.9rem;
             margin-bottom: 10px;
@@ -351,14 +343,12 @@
             color: var(--pf-dark);
         }
 
-        /* DIVISOR HORIZONTAL */
         .pf-divider {
             border: none;
             border-top: 1px solid var(--line-color);
             margin: 10px 0;
         }
 
-        /* RESUMEN Y BOTÓN EXPANDIR */
         .pf-summary {
             font-size: 0.92rem;
             color: var(--pf-dark);
@@ -366,7 +356,6 @@
             white-space: pre-line;
         }
 
-        /* BOTÓN DESPLEGABLE CON ICONO MÁS/MENOS */
         .toggle-desc-btn {
             background: none;
             border: none;
@@ -391,7 +380,6 @@
             text-decoration: underline;
         }
 
-        /* CONTENIDO EXTENDIDO */
         .pf-expanded-content {
             display: none;
             margin-top: 10px;
@@ -402,7 +390,7 @@
         }
 
         .pf-description-full {
-            white-space: pre-line; /* Respeta saltos de linea de Google Sheets */
+            white-space: pre-line;
             margin-bottom: 8px;
         }
 
@@ -459,17 +447,10 @@
             transform: translateY(-3px);
         }
 
-        /* Ajustes para móvil */
         @media (max-width: 600px) {
-            header {
-                padding: 10px;
-            }
-            .pf-main-logo {
-                max-width: 220px;
-            }
-            h1 {
-                font-size: 1.35rem;
-            }
+            header { padding: 10px; }
+            .pf-main-logo { max-width: 220px; }
+            h1 { font-size: 1.35rem; }
         }
 
         footer {
@@ -487,7 +468,6 @@
 <div class="container">
     <header>
         <div>
-            <!-- LOGO Y TÍTULO JUNTO Y COMPACTO -->
             <img src="./icons/PF2Logo.webp" alt="Pathfinder 2e Logo" class="pf-main-logo">
             <h1>Compendio Mágico</h1>
         </div>
@@ -503,23 +483,33 @@
                 <input type="text" id="searchInput" placeholder="Buscar por nombre, efecto, rasgos..." oninput="applyFilters()">
             </div>
             
-            <div class="level-filter-container">
-                <span class="level-label">Rango:</span>
-                <button class="level-btn active" data-level="all" onclick="filterLevel('all')">Todos</button>
-                <button class="level-btn" data-level="0" onclick="filterLevel('0')">Trucos</button>
-                <button class="level-btn" data-level="1" onclick="filterLevel('1')">1</button>
-                <button class="level-btn" data-level="2" onclick="filterLevel('2')">2</button>
-                <button class="level-btn" data-level="3" onclick="filterLevel('3')">3</button>
-                <button class="level-btn" data-level="4" onclick="filterLevel('4')">4</button>
-                <button class="level-btn" data-level="5" onclick="filterLevel('5')">5</button>
-                <button class="level-btn" data-level="6" onclick="filterLevel('6')">6</button>
-                <button class="level-btn" data-level="7" onclick="filterLevel('7')">7</button>
-                <button class="level-btn" data-level="8" onclick="filterLevel('8')">8</button>
-                <button class="level-btn" data-level="9" onclick="filterLevel('9')">9</button>
-                <button class="level-btn" data-level="10" onclick="filterLevel('10')">10</button>
+            <div class="filter-container">
+                <span class="filter-label">Tipo:</span>
+                <button class="filter-btn active" data-type="all" onclick="filterType('all')">Todos</button>
+                <button class="filter-btn" data-type="conjuro" onclick="filterType('conjuro')">Conjuros</button>
+                <button class="filter-btn" data-type="foco" onclick="filterType('foco')">Conjuros de Foco</button>
+                <button class="filter-btn" data-type="ritual" onclick="filterType('ritual')">Rituales</button>
             </div>
 
             <button class="clear-btn" onclick="clearAllFilters()" title="Limpiar filtros">🧹</button>
+        </div>
+
+        <div class="controls-row-type">
+            <div class="filter-container">
+                <span class="filter-label">Rango:</span>
+                <button class="filter-btn level-btn active" data-level="all" onclick="filterLevel('all')">Todos</button>
+                <button class="filter-btn level-btn" data-level="0" onclick="filterLevel('0')">Trucos</button>
+                <button class="filter-btn level-btn" data-level="1" onclick="filterLevel('1')">1</button>
+                <button class="filter-btn level-btn" data-level="2" onclick="filterLevel('2')">2</button>
+                <button class="filter-btn level-btn" data-level="3" onclick="filterLevel('3')">3</button>
+                <button class="filter-btn level-btn" data-level="4" onclick="filterLevel('4')">4</button>
+                <button class="filter-btn level-btn" data-level="5" onclick="filterLevel('5')">5</button>
+                <button class="filter-btn level-btn" data-level="6" onclick="filterLevel('6')">6</button>
+                <button class="filter-btn level-btn" data-level="7" onclick="filterLevel('7')">7</button>
+                <button class="filter-btn level-btn" data-level="8" onclick="filterLevel('8')">8</button>
+                <button class="filter-btn level-btn" data-level="9" onclick="filterLevel('9')">9</button>
+                <button class="filter-btn level-btn" data-level="10" onclick="filterLevel('10')">10</button>
+            </div>
         </div>
     </div>
 
@@ -539,6 +529,7 @@
 
     let datosGlobales = [];
     let currentLevel = 'all';
+    let currentType = 'all';
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
@@ -560,26 +551,15 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
-    // Convertidor para la cabecera del conjuro (Soporta textos, números y símbolos ◆)
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
 
-        if (t.includes('libre')) {
-            return `<img src="./icons/free_action.png" class="pf-action-header-img" alt="Acción Libre" title="Acción Libre">`;
-        }
-        if (t.includes('reacción') || t.includes('reaccion')) {
-            return `<img src="./icons/reaction.png" class="pf-action-header-img" alt="Reacción" title="Reacción">`;
-        }
-        if (t.includes('3') || t.includes('tres') || t.includes('◆◆◆')) {
-            return `<img src="./icons/three_action.png" class="pf-action-header-img" alt="3 Acciones" title="3 Acciones">`;
-        }
-        if (t.includes('2') || t.includes('dos') || t.includes('◆◆')) {
-            return `<img src="./icons/two_action.png" class="pf-action-header-img" alt="2 Acciones" title="2 Acciones">`;
-        }
-        if (t.includes('1') || t.includes('una') || t.includes('◆')) {
-            return `<img src="./icons/single_action.png" class="pf-action-header-img" alt="1 Acción" title="1 Acción">`;
-        }
+        if (t.includes('libre')) return `<img src="./icons/free_action.png" class="pf-action-header-img" alt="Acción Libre">`;
+        if (t.includes('reacción') || t.includes('reaccion')) return `<img src="./icons/reaction.png" class="pf-action-header-img" alt="Reacción">`;
+        if (t.includes('3') || t.includes('tres') || t.includes('◆◆◆')) return `<img src="./icons/three_action.png" class="pf-action-header-img" alt="3 Acciones">`;
+        if (t.includes('2') || t.includes('dos') || t.includes('◆◆')) return `<img src="./icons/two_action.png" class="pf-action-header-img" alt="2 Acciones">`;
+        if (t.includes('1') || t.includes('una') || t.includes('◆')) return `<img src="./icons/single_action.png" class="pf-action-header-img" alt="1 Acción">`;
         if (t.includes('variable')) {
             return `
                 <span class="pf-actions-container">
@@ -591,14 +571,9 @@
         return accText;
     }
 
-    // Reemplaza referencias tanto en español como en inglés por los iconos
     function reemplazarIconosEnTexto(texto) {
         if (!esValido(texto)) return '';
-        
-        let resultado = texto;
-
-        // 0. Limpiar basura de HTML previo o tags <img> incompletos si venían en el Excel
-        resultado = resultado.replace(/<img[^>]*>/gi, '');
+        let resultado = texto.replace(/<img[^>]*>/gi, '');
 
         const imgSingle = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
         const imgTwo = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
@@ -606,14 +581,12 @@
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
         const imgFree = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
 
-        // 1. Textos en Castellano del manual
         resultado = resultado.replace(/Acción individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
         resultado = resultado.replace(/Dos acciones:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
         resultado = resultado.replace(/Tres acciones:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
         resultado = resultado.replace(/Reacción:/gi, `${imgReaction} <strong>Reacción:</strong>`);
         resultado = resultado.replace(/Acción libre:/gi, `${imgFree} <strong>Acción libre:</strong>`);
 
-        // 2. Etiquetas en Inglés por si vienen del manual/Foundry
         resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
         resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
         resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
@@ -722,18 +695,37 @@
                 const potenciacion = reemplazarIconosEnTexto(getVal(item, 'Potenciación') || getVal(item, 'Potenciado'));
                 const fuente = getVal(item, 'Fuente');
 
+                // Clasificación según manual (Conjuro, Conjuro de Foco, Ritual)
+                let tipoNormalizado = 'conjuro';
+                const catLower = categoria.toLowerCase();
+                const rasgosLower = rasgosRaw.toLowerCase();
+
+                if (catLower.includes('foco') || rasgosLower.includes('foco')) {
+                    tipoNormalizado = 'foco';
+                } else if (catLower.includes('ritual') || rasgosLower.includes('ritual')) {
+                    tipoNormalizado = 'ritual';
+                }
+
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.setAttribute('data-name', `${nombre} ${nameEN}`);
                 card.setAttribute('data-desc', `${resumenEfecto} ${descripcionLarga}`);
                 card.setAttribute('data-level', rango);
                 card.setAttribute('data-traits', rasgosRaw);
+                card.setAttribute('data-type', tipoNormalizado);
 
+                // Formato idéntico al manual para la esquina superior derecha
                 const esTruco = (rango === '0' || rango.toLowerCase().includes('truco'));
-                const cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
+                let cabeceraRangoText = esTruco ? 'TRUCO 0' : `CONJURO ${rango}`;
+
+                if (tipoNormalizado === 'foco') {
+                    cabeceraRangoText = `CONJURO DE FOCO ${rango}`;
+                } else if (tipoNormalizado === 'ritual') {
+                    cabeceraRangoText = `RITUAL ${rango}`;
+                }
+
                 const accionesHTML = formatearAcciones(accionesRaw);
 
-                // --- CAJAS DE RASGOS ---
                 const tagsVistos = new Set();
                 let rasgosCajasHTML = '';
 
@@ -752,9 +744,7 @@
                     tagsVistos.add(categoria.toLowerCase());
                 }
 
-                // --- ESTADÍSTICAS EN TEXTO PLANO ---
                 let statsHTML = '';
-                
                 if (esValido(tradicionRaw)) {
                     statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Tradiciones</span> ${tradicionRaw}</div>`;
                 }
@@ -778,7 +768,6 @@
                     statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Daño</span> ${danoBase} ${tipoDano}</div>`;
                 }
 
-                // Desplegable
                 let expandSectionHTML = '';
                 const tieneTextoExtra = esValido(descripcionLarga) || esValido(potenciacion);
 
@@ -804,7 +793,6 @@
 
                 card.innerHTML = `
                     <div>
-                        <!-- Línea 1: Título e Iconos de Acción -->
                         <div class="pf-header-row">
                             <div class="pf-title-container">
                                 <span class="pf-title">${nombre || 'Sin Nombre'}</span>
@@ -815,18 +803,14 @@
                         
                         ${nameEN ? `<div class="pf-name-en">(${nameEN})</div>` : ''}
 
-                        <!-- Línea 2: Rasgos granates -->
                         ${rasgosCajasHTML ? `<div class="pf-traits-row">${rasgosCajasHTML}</div>` : ''}
 
-                        <!-- Línea 3: Estadísticas -->
                         ${statsHTML ? `<div class="pf-stats-block">${statsHTML}</div>` : ''}
 
                         <hr class="pf-divider">
 
-                        <!-- Texto corto principal (Resumen Efecto) -->
                         <div class="pf-summary">${resumenEfecto || ''}</div>
 
-                        <!-- Sección desplegable con botón "+" -->
                         ${expandSectionHTML}
                     </div>
 
@@ -850,8 +834,17 @@
         applyFilters();
     }
 
+    function filterType(type) {
+        currentType = type;
+        document.querySelectorAll('.filter-container .filter-btn:not(.level-btn)').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-type') === type);
+        });
+        applyFilters();
+    }
+
     function clearAllFilters() {
         document.getElementById('searchInput').value = '';
+        filterType('all');
         filterLevel('all');
     }
 
@@ -869,12 +862,14 @@
                 const desc = card.getAttribute('data-desc').toLowerCase();
                 const traits = card.getAttribute('data-traits').toLowerCase();
                 const level = card.getAttribute('data-level').toLowerCase();
+                const type = card.getAttribute('data-type').toLowerCase();
                 const text = card.textContent.toLowerCase();
 
                 const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query) || text.includes(query);
                 const matchesLevel = (currentLevel === 'all' || level.trim() === currentLevel || (currentLevel === '0' && level.includes('truco')));
+                const matchesType = (currentType === 'all' || type === currentType);
 
-                if (matchesSearch && matchesLevel) {
+                if (matchesSearch && matchesLevel && matchesType) {
                     card.style.display = 'flex';
                     visibleCardsInSection++;
                     totalVisibleCards++;
