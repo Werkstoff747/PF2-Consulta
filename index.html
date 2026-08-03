@@ -550,21 +550,11 @@
             </div>
         </div>
 
-        <!-- FILA DINÁMICA DE CLASES -->
+        <!-- FILA DINÁMICA DE CLASES (Se genera sola con lo que haya en Sheets) -->
         <div class="controls-row-class" id="classFilterRow">
-            <div class="filter-container">
+            <div class="filter-container" id="dynamicClassContainer">
                 <span class="filter-label">Clase:</span>
                 <button class="filter-btn class-btn active" data-class="all" onclick="filterClass('all')">Todas</button>
-                <button class="filter-btn class-btn" data-class="bardo" onclick="filterClass('bardo')">Bardo</button>
-                <button class="filter-btn class-btn" data-class="clérigo" onclick="filterClass('clérigo')">Clérigo</button>
-                <button class="filter-btn class-btn" data-class="druida" onclick="filterClass('druida')">Druida</button>
-                <button class="filter-btn class-btn" data-class="explorador" onclick="filterClass('explorador')">Explorador</button>
-                <button class="filter-btn class-btn" data-class="brujo" onclick="filterClass('brujo')">Brujo</button>
-                <button class="filter-btn class-btn" data-class="mago" onclick="filterClass('mago')">Mago</button>
-                <button class="filter-btn class-btn" data-class="campeón" onclick="filterClass('campeón')">Campeón</button>
-                <button class="filter-btn class-btn" data-class="monje" onclick="filterClass('monje')">Monje</button>
-                <button class="filter-btn class-btn" data-class="hechicero" onclick="filterClass('hechicero')">Hechicero</button>
-                <button class="filter-btn class-btn" data-class="psíquico" onclick="filterClass('psíquico')">Psíquico</button>
             </div>
         </div>
     </div>
@@ -588,7 +578,7 @@
     let currentType = 'all';
     let currentClass = 'all';
 
-    const CLASES_LISTA = ["bardo", "clérigo", "clerigo", "druida", "explorador", "brujo", "mago", "campeón", "campeon", "monje", "hechicero", "psíquico", "psiquico", "oráculo", "oraculo", "alquimista", "inventor", "swashbuckler", "barbaro", "bárbaro", "guerrero", "pícaro", "picaro"];
+    const CLASES_MAESTRAS = ["bardo", "clérigo", "clerigo", "druida", "explorador", "brujo", "mago", "campeón", "campeon", "monje", "hechicero", "psíquico", "psiquico", "oráculo", "oraculo", "alquimista", "inventor", "swashbuckler", "barbaro", "bárbaro", "guerrero", "pícaro", "picaro"];
     const RAREZAS_LISTA = ["poco común", "poco comun", "uncommon", "raro", "rare", "único", "unico", "unique"];
 
     function toggleTheme() {
@@ -611,9 +601,16 @@
         return v !== '' && v !== 'n/a' && v !== 'n/a n/a' && v !== '-';
     }
 
+    function esTiempoLanzamiento(t) {
+        return t.includes('min') || t.includes('hora') || t.includes('dia') || t.includes('día');
+    }
+
     function formatearAcciones(accText) {
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
+
+        // Si es un tiempo largo (10 min, 1 hora...), no dibuja iconos en el título
+        if (esTiempoLanzamiento(t)) return '';
 
         if (t.includes('libre')) return `<img src="./icons/free_action.png" class="pf-action-header-img" alt="Acción Libre">`;
         if (t.includes('reacción') || t.includes('reaccion')) return `<img src="./icons/reaction.png" class="pf-action-header-img" alt="Reacción">`;
@@ -687,6 +684,7 @@
                 });
 
                 document.getElementById('loading').style.display = 'none';
+                construirBotoneraClasesDinamica(datosGlobales);
                 renderizarCompendio(datosGlobales);
             },
             error: function(err) {
@@ -700,6 +698,36 @@
             btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
         });
     });
+
+    // DETECCIÓN DINÁMICA DE CLASES PRESENTES EN EL CSV
+    function construirBotoneraClasesDinamica(datos) {
+        const container = document.getElementById('dynamicClassContainer');
+        container.innerHTML = '<span class="filter-label">Clase:</span><button class="filter-btn class-btn active" data-class="all" onclick="filterClass(\'all\')">Todas</button>';
+
+        const clasesEncontradas = new Set();
+
+        datos.forEach(row => {
+            const rasgos = getVal(row, 'Rasgos').toLowerCase();
+            const cat = getVal(row, 'Categoría').toLowerCase();
+            
+            CLASES_MAESTRAS.forEach(cls => {
+                if (rasgos.includes(cls) || cat.includes(cls)) {
+                    // Formatear capitalizado bonito
+                    const nombreBonito = cls.charAt(0).toUpperCase() + cls.slice(1);
+                    clasesEncontradas.add(nombreBonito);
+                }
+            });
+        });
+
+        Array.from(clasesEncontradas).sort().forEach(clase => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn class-btn';
+            btn.setAttribute('data-class', clase.toLowerCase());
+            btn.onclick = () => filterClass(clase.toLowerCase());
+            btn.textContent = clase;
+            container.appendChild(btn);
+        });
+    }
 
     function crearTarjetaHTML(item) {
         const nombre = getVal(item, 'Nombre');
@@ -766,7 +794,7 @@
                 let extraClass = '';
                 if (RAREZAS_LISTA.some(rar => rLower.includes(rar))) {
                     extraClass = 'trait-uncommon';
-                } else if (CLASES_LISTA.some(cls => rLower.includes(cls))) {
+                } else if (CLASES_MAESTRAS.some(cls => rLower.includes(cls))) {
                     extraClass = 'trait-class';
                 }
 
@@ -784,6 +812,11 @@
         let statsHTML = '';
         if (esValido(tradicionRaw)) {
             statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Tradiciones</span> ${tradicionRaw}</div>`;
+        }
+
+        // Si es un tiempo de lanzamiento (ej. 10 minutos), se inserta en estadísticas
+        if (esValido(accionesRaw) && esTiempoLanzamiento(accionesRaw.toLowerCase())) {
+            statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Lanzamiento</span> ${accionesRaw}</div>`;
         }
 
         let lineaDistanciaObj = [];
@@ -861,7 +894,6 @@
         const wrapper = document.getElementById('disciplinesWrapper');
         wrapper.innerHTML = '';
 
-        // MODO A-Z: Muestra una única lista alfabética sin cabeceras por rango
         if (currentLevel === 'az') {
             const sec = document.createElement('div');
             sec.className = 'discipline-section';
@@ -883,7 +915,6 @@
             return;
         }
 
-        // MODO POR RANGOS: Agrupa por Rango N
         const agrupados = {};
         datos.forEach(row => {
             const rangoRaw = getVal(row, 'Rango') || '1';
@@ -926,7 +957,6 @@
             btn.classList.toggle('active', btn.getAttribute('data-level') === level);
         });
 
-        // Si cambia entre A-Z y Rangos, vuelve a renderizar la cuadrícula
         renderizarCompendio(datosGlobales);
     }
 
@@ -1001,7 +1031,6 @@
 
                 const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query) || text.includes(query);
                 
-                // Filtro de Nivel/Rango
                 let matchesLevel = false;
                 if (currentLevel === 'all' || currentLevel === 'az') {
                     matchesLevel = true;
