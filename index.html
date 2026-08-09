@@ -640,21 +640,28 @@
     function reemplazarIconosEnTexto(texto) {
         if (!esValido(texto)) return '';
         let resultado = texto;
-
+    
         const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
         const imgTwo      = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
         const imgThree    = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
         const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
-
-        // 1. Reemplaza cualquier etiqueta <img> previa del Excel que apunte a nombres antiguos o sin ruta
-        resultado = resultado.replace(/<img\s+[^>]*1\s*Acci[oó]n[^>]*>/gi, imgSingle);
-        resultado = resultado.replace(/<img\s+[^>]*2\s*Acci[oó]n[^>]*>/gi, imgTwo);
-        resultado = resultado.replace(/<img\s+[^>]*3\s*Acci[oó]n[^>]*>/gi, imgThree);
-        resultado = resultado.replace(/<img\s+[^>]*Reacci[oó]n[^>]*>/gi, imgReaction);
-        resultado = resultado.replace(/<img\s+[^>]*Libre[^>]*>/gi, imgFree);
-
-        // 2. Aplica formato en negrita a las cabeceras y asegura un solo icono
+    
+        // 1. Limpia cualquier etiqueta <img> rota proveniente del Excel (como "<img 1 Acción.png...>")
+        resultado = resultado.replace(/<img[^>]*1\s*Acci[oó]n[^>]*>/gi, imgSingle);
+        resultado = resultado.replace(/<img[^>]*2\s*Acci[oó]n[^>]*>/gi, imgTwo);
+        resultado = resultado.replace(/<img[^>]*3\s*Acci[oó]n[^>]*>/gi, imgThree);
+        resultado = resultado.replace(/<img[^>]*Reacci[oó]n[^>]*>/gi, imgReaction);
+        resultado = resultado.replace(/<img[^>]*Libre[^>]*>/gi, imgFree);
+    
+        // 2. Normaliza nombres de archivos si se colaron como texto plano (ej: "1 Acción.png")
+        resultado = resultado.replace(/1\s*Acci[oó]n\.png/gi, imgSingle);
+        resultado = resultado.replace(/2\s*Acci[oó]nes\.png/gi, imgTwo);
+        resultado = resultado.replace(/3\s*Acci[oó]nes\.png/gi, imgThree);
+        resultado = resultado.replace(/Reacci[oó]n\.png/gi, imgReaction);
+        resultado = resultado.replace(/Acci[oó]n\s*Libre\.png/gi, imgFree);
+    
+        // 3. Aplica formato limpio a los títulos de acciones en el texto
         resultado = resultado.replace(/(<img[^>]*pf-action-img[^>]*>)?\s*(Acci[oó]n individual:|Dos acciones:|Tres acciones:|Reacci[oó]n:|Acci[oó]n libre:)/gi, (match, imgExistente, textoAccion) => {
             const textoNegrita = `<strong>${textoAccion}</strong>`;
             const lower = textoAccion.toLowerCase();
@@ -667,17 +674,16 @@
             
             return match;
         });
-
-        // 3. Reemplaza sintaxis con corchetes [single-action], etc.
+    
+        // 4. Reemplaza sintaxis de corchetes si las hubiera
         resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
         resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
         resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
         resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
         resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
-
+    
         return resultado;
     }
-
     function toggleCardExpand(btn) {
         const expandedContent = btn.nextElementSibling;
         const isHidden = window.getComputedStyle(expandedContent).display === 'none';
