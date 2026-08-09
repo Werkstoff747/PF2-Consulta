@@ -647,15 +647,15 @@
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
         const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
     
-        // Limpieza de cualquier resto antiguo
+        // Limpieza de restos anteriores por si acaso
         resultado = resultado.replace(/<img[^>]*>/gi, '');
     
-        // Reemplazo basado en tus nuevos corchetes profesionales
-        resultado = resultado.replace(/\[1\]/g, `${imgSingle} <strong>Acción individual:</strong>`);
-        resultado = resultado.replace(/\[2\]/g, `${imgTwo} <strong>Dos acciones:</strong>`);
-        resultado = resultado.replace(/\[3\]/g, `${imgThree} <strong>Tres acciones:</strong>`);
-        resultado = resultado.replace(/\[reaccion\]/gi, `${imgReaction} <strong>Reacción:</strong>`);
-        resultado = resultado.replace(/\[libre\]/gi, `${imgFree} <strong>Acción libre:</strong>`);
+        // Reemplaza los corchetes únicamente por la imagen limpia (sin repetir el texto)
+        resultado = resultado.replace(/\[1\]/g, imgSingle);
+        resultado = resultado.replace(/\[2\]/g, imgTwo);
+        resultado = resultado.replace(/\[3\]/g, imgThree);
+        resultado = resultado.replace(/\[reaccion\]/gi, imgReaction);
+        resultado = resultado.replace(/\[libre\]/gi, imgFree);
     
         return resultado;
     }
