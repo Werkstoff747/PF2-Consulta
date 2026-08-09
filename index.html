@@ -74,7 +74,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 15px; /* Reducimos aún más para eliminar margen verde en los bordes */
+            padding: 4px 15px;         /* Minimiza el fondo verde arriba y abajo */
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 20px;
             background: var(--header-bg);
@@ -84,11 +84,11 @@
         }
 
         .pf-main-logo {
-            max-width: 580px;         /* Logo significativamente más grande */
-            width: 95%;               /* Ocupa hasta el 95% del ancho disponible */
+            max-width: 650px;          /* Logo imponente */
+            width: 95%;
             height: auto;
             display: block;
-            margin: 0 auto -12px auto;/* Margen negativo para pegar las letras al logo */
+            margin: -5px auto -35px auto; /* Absorbe el borde transparente inferior del archivo de imagen */
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
@@ -119,14 +119,14 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3.2rem;         /* Letras mucho más grandes y potentes */
+            font-size: 3.6rem;         /* Letras grandes y visibles */
             font-variant: small-caps;  /* Versalitas */
             color: #ffffff !important;
-            letter-spacing: 2.5px;
+            letter-spacing: 2px;
             text-transform: lowercase;
-            line-height: 0.9;          /* Reducción de interlineado para pegar más el texto */
-            margin-top: 0;
-            margin-bottom: 4px;
+            line-height: 0.85;         /* Reduce la altura de línea para subir el texto */
+            margin-top: -10px;         /* Pega el texto directamente al borde del logo */
+            margin-bottom: 2px;        /* Ajuste fino del borde inferior */
             text-shadow: 0 2px 6px rgba(0,0,0,0.7);
         }
 
