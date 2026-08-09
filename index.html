@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compendio Mágico PF2e Remaster</title>
+    <title>Compendio Mágico de Golarion — PF2e Remaster</title>
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Fuentes estilo Pathfinder / Paizo -->
@@ -72,7 +72,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 20px;
+            padding: 18px 20px;
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 20px;
             background: var(--header-bg);
@@ -82,11 +82,11 @@
         }
 
         .pf-main-logo {
-            max-width: 310px;
-            width: 75%;
+            max-width: 480px;
+            width: 90%;
             height: auto;
             display: block;
-            margin: 0 auto -2px auto;
+            margin: 0 auto 12px auto;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
@@ -117,13 +117,14 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-variant: small-caps;
             color: #ffffff !important;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            line-height: 1;
+            letter-spacing: 2.5px;
+            text-transform: lowercase;
+            line-height: 1.1;
             margin-top: 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.6);
         }
 
         .controls {
@@ -485,9 +486,9 @@
         }
 
         @media (max-width: 600px) {
-            header { padding: 10px; }
-            .pf-main-logo { max-width: 220px; }
-            h1 { font-size: 1.35rem; }
+            header { padding: 12px; }
+            .pf-main-logo { max-width: 280px; }
+            h1 { font-size: 1.4rem; }
         }
 
         footer {
@@ -506,7 +507,7 @@
     <header>
         <div>
             <img src="./icons/PF2Logo.webp" alt="Pathfinder 2e Logo" class="pf-main-logo">
-            <h1>Compendio Mágico</h1>
+            <h1>Compendio Mágico de Golarion</h1>
         </div>
 
         <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
@@ -550,7 +551,7 @@
             </div>
         </div>
 
-        <!-- FILA DINÁMICA DE CLASES (Se genera sola con lo que haya en Sheets) -->
+        <!-- FILA DINÁMICA DE CLASES -->
         <div class="controls-row-class" id="classFilterRow">
             <div class="filter-container" id="dynamicClassContainer">
                 <span class="filter-label">Clase:</span>
@@ -564,7 +565,13 @@
     <div id="disciplinesWrapper"></div>
 
     <footer>
-        Compendio Mágico Pathfinder 2e — Maquetado Remasterizado.
+        <p><strong>Compendio Mágico de Golarion — Maquetado Remasterizado.</strong></p>
+        <p style="font-size: 0.75rem; margin-top: 8px; opacity: 0.8; line-height: 1.4;">
+            Esta aplicación es una herramienta de consulta no oficial para jugadores y Directores de Juego, creada sin ánimo de lucro. 
+            <em>Pathfinder</em>, el logotipo de <em>Pathfinder</em>, el escenario de <em>Golarion</em> y sus elementos relacionados son marcas registradas de Paizo Inc. 
+            El material original y sus traducciones oficiales pertenecen a Paizo Inc. y Devir Iberia. 
+            Consigue los libros y suplementos oficiales en las webs de <a href="https://devir.com" target="_blank" style="color: inherit; text-decoration: underline;">Devir</a> y <a href="https://paizo.com" target="_blank" style="color: inherit; text-decoration: underline;">Paizo</a>.
+        </p>
     </footer>
 </div>
 
@@ -609,7 +616,6 @@
         if (!esValido(accText)) return '';
         const t = accText.toLowerCase();
 
-        // Si es un tiempo largo (10 min, 1 hora...), no dibuja iconos en el título
         if (esTiempoLanzamiento(t)) return '';
 
         if (t.includes('libre')) return `<img src="./icons/free_action.png" class="pf-action-header-img" alt="Acción Libre">`;
@@ -630,20 +636,29 @@
 
     function reemplazarIconosEnTexto(texto) {
         if (!esValido(texto)) return '';
-        let resultado = texto.replace(/<img[^>]*>/gi, '');
+        let resultado = texto;
 
-        const imgSingle = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
-        const imgTwo = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
-        const imgThree = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
+        const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
+        const imgTwo      = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
+        const imgThree    = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
-        const imgFree = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
+        const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
 
-        resultado = resultado.replace(/Acción individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
+        // Reemplaza referencias con nombres de archivo en formato de imagen
+        resultado = resultado.replace(/<img\s+src=["']?1\s*Acci[oó]n\s*\.png["']?[^>]*>/gi, imgSingle);
+        resultado = resultado.replace(/<img\s+src=["']?2\s*Acci[oó]nes\s*\.png["']?[^>]*>/gi, imgTwo);
+        resultado = resultado.replace(/<img\s+src=["']?3\s*Acci[oó]nes\s*\.png["']?[^>]*>/gi, imgThree);
+        resultado = resultado.replace(/<img\s+src=["']?Reacci[oó]n\s*\.png["']?[^>]*>/gi, imgReaction);
+        resultado = resultado.replace(/<img\s+src=["']?Acci[oó]n\s*Libre\s*\.png["']?[^>]*>/gi, imgFree);
+
+        // Reemplaza textos oficiales
+        resultado = resultado.replace(/Acci[oó]n individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
         resultado = resultado.replace(/Dos acciones:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
         resultado = resultado.replace(/Tres acciones:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
-        resultado = resultado.replace(/Reacción:/gi, `${imgReaction} <strong>Reacción:</strong>`);
-        resultado = resultado.replace(/Acción libre:/gi, `${imgFree} <strong>Acción libre:</strong>`);
+        resultado = resultado.replace(/Reacci[oó]n:/gi, `${imgReaction} <strong>Reacción:</strong>`);
+        resultado = resultado.replace(/Acci[oó]n libre:/gi, `${imgFree} <strong>Acción libre:</strong>`);
 
+        // Reemplaza sintaxis con corchetes
         resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
         resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
         resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
@@ -699,7 +714,6 @@
         });
     });
 
-    // DETECCIÓN DINÁMICA DE CLASES PRESENTES EN EL CSV
     function construirBotoneraClasesDinamica(datos) {
         const container = document.getElementById('dynamicClassContainer');
         container.innerHTML = '<span class="filter-label">Clase:</span><button class="filter-btn class-btn active" data-class="all" onclick="filterClass(\'all\')">Todas</button>';
@@ -712,7 +726,6 @@
             
             CLASES_MAESTRAS.forEach(cls => {
                 if (rasgos.includes(cls) || cat.includes(cls)) {
-                    // Formatear capitalizado bonito
                     const nombreBonito = cls.charAt(0).toUpperCase() + cls.slice(1);
                     clasesEncontradas.add(nombreBonito);
                 }
@@ -814,7 +827,6 @@
             statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Tradiciones</span> ${tradicionRaw}</div>`;
         }
 
-        // Si es un tiempo de lanzamiento (ej. 10 minutos), se inserta en estadísticas
         if (esValido(accionesRaw) && esTiempoLanzamiento(accionesRaw.toLowerCase())) {
             statsHTML += `<div class="pf-stats-line"><span class="pf-stats-label">Lanzamiento</span> ${accionesRaw}</div>`;
         }
@@ -1027,9 +1039,8 @@
                 const level = card.getAttribute('data-level').toLowerCase();
                 const type = card.getAttribute('data-type').toLowerCase();
                 const isTruco = card.getAttribute('data-istruco') === 'true';
-                const text = card.textContent.toLowerCase();
 
-                const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query) || text.includes(query);
+                const matchesSearch = !query || name.includes(query) || desc.includes(query) || traits.includes(query);
                 
                 let matchesLevel = false;
                 if (currentLevel === 'all' || currentLevel === 'az') {
@@ -1041,7 +1052,7 @@
                 }
 
                 const matchesType = (currentType === 'all' || type === currentType);
-                const matchesClass = (currentClass === 'all' || traits.includes(currentClass) || text.includes(currentClass));
+                const matchesClass = (currentClass === 'all' || traits.includes(currentClass));
 
                 if (matchesSearch && matchesLevel && matchesType && matchesClass) {
                     card.style.display = 'flex';
