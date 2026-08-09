@@ -636,39 +636,45 @@
     }
 
     function reemplazarIconosEnTexto(texto) {
-        if (!esValido(texto)) return '';
-        let resultado = texto;
+    if (!esValido(texto)) return '';
+    let resultado = texto;
 
-        const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
-        const imgTwo      = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
-        const imgThree    = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
-        const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
-        const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
+    const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
+    const imgTwo      = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
+    const imgThree    = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
+    const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
+    const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
 
-        // Reemplaza referencias con nombres de archivo en formato de imagen
-        resultado = resultado.replace(/<img\s+src=["']?1\s*Acci[oó]n\s*\.png["']?[^>]*>/gi, imgSingle);
-        resultado = resultado.replace(/<img\s+src=["']?2\s*Acci[oó]nes\s*\.png["']?[^>]*>/gi, imgTwo);
-        resultado = resultado.replace(/<img\s+src=["']?3\s*Acci[oó]nes\s*\.png["']?[^>]*>/gi, imgThree);
-        resultado = resultado.replace(/<img\s+src=["']?Reacci[oó]n\s*\.png["']?[^>]*>/gi, imgReaction);
-        resultado = resultado.replace(/<img\s+src=["']?Acci[oó]n\s*Libre\s*\.png["']?[^>]*>/gi, imgFree);
+    // 1. Reemplaza cualquier etiqueta <img> previa del Excel que apunte a nombres antiguos o sin ruta
+    resultado = resultado.replace(/<img\s+[^>]*1\s*Acci[oó]n[^>]*>/gi, imgSingle);
+    resultado = resultado.replace(/<img\s+[^>]*2\s*Acci[oó]n[^>]*>/gi, imgTwo);
+    resultado = resultado.replace(/<img\s+[^>]*3\s*Acci[oó]n[^>]*>/gi, imgThree);
+    resultado = resultado.replace(/<img\s+[^>]*Reacci[oó]n[^>]*>/gi, imgReaction);
+    resultado = resultado.replace(/<img\s+[^>]*Libre[^>]*>/gi, imgFree);
 
-        // Reemplaza textos oficiales
-        resultado = resultado.replace(/Acci[oó]n individual:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
-        resultado = resultado.replace(/Dos acciones:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
-        resultado = resultado.replace(/Tres acciones:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
-        resultado = resultado.replace(/Reacci[oó]n:/gi, `${imgReaction} <strong>Reacción:</strong>`);
-        resultado = resultado.replace(/Acci[oó]n libre:/gi, `${imgFree} <strong>Acción libre:</strong>`);
+    // 2. Aplica formato en negrita a las cabeceras y asegura un solo icono
+    resultado = resultado.replace(/(<img[^>]*pf-action-img[^>]*>)?\s*(Acci[oó]n individual:|Dos acciones:|Tres acciones:|Reacci[oó]n:|Acci[oó]n libre:)/gi, (match, imgExistente, textoAccion) => {
+        const textoNegrita = `<strong>${textoAccion}</strong>`;
+        const lower = textoAccion.toLowerCase();
+        
+        if (lower.includes('individual')) return `${imgExistente || imgSingle} ${textoNegrita}`;
+        if (lower.includes('dos'))        return `${imgExistente || imgTwo} ${textoNegrita}`;
+        if (lower.includes('tres'))       return `${imgExistente || imgThree} ${textoNegrita}`;
+        if (lower.includes('reacci'))     return `${imgExistente || imgReaction} ${textoNegrita}`;
+        if (lower.includes('libre'))      return `${imgExistente || imgFree} ${textoNegrita}`;
+        
+        return match;
+    });
 
-        // Reemplaza sintaxis con corchetes
-        resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
-        resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
-        resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
-        resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
-        resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
+    // 3. Reemplaza códigos con corchetes [single-action], etc.
+    resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
+    resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
+    resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
+    resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
+    resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
 
-        return resultado;
-    }
-
+    return resultado;
+}
     function toggleCardExpand(btn) {
         const expandedContent = btn.nextElementSibling;
         const isHidden = window.getComputedStyle(expandedContent).display === 'none';
