@@ -638,7 +638,7 @@
     }
 
     function reemplazarIconosEnTexto(texto) {
-        if (!esValido(texto)) return '';
+        if (!texto) return '';
         let resultado = texto;
     
         const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
@@ -647,35 +647,17 @@
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
         const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
     
-        // 1. Limpia cualquier etiqueta <img> rota proveniente del Excel (como "<img 1 Acción.png...>")
-        resultado = resultado.replace(/<img[^>]*1\s*Acci[oó]n[^>]*>/gi, imgSingle);
-        resultado = resultado.replace(/<img[^>]*2\s*Acci[oó]n[^>]*>/gi, imgTwo);
-        resultado = resultado.replace(/<img[^>]*3\s*Acci[oó]n[^>]*>/gi, imgThree);
-        resultado = resultado.replace(/<img[^>]*Reacci[oó]n[^>]*>/gi, imgReaction);
-        resultado = resultado.replace(/<img[^>]*Libre[^>]*>/gi, imgFree);
+        // 1. Limpia cualquier etiqueta <img> rota o texto previo que se haya colado
+        resultado = resultado.replace(/<img[^>]*>/gi, '');
     
-        // 2. Normaliza nombres de archivos si se colaron como texto plano (ej: "1 Acción.png")
-        resultado = resultado.replace(/1\s*Acci[oó]n\.png/gi, imgSingle);
-        resultado = resultado.replace(/2\s*Acci[oó]nes\.png/gi, imgTwo);
-        resultado = resultado.replace(/3\s*Acci[oó]nes\.png/gi, imgThree);
-        resultado = resultado.replace(/Reacci[oó]n\.png/gi, imgReaction);
-        resultado = resultado.replace(/Acci[oó]n\s*Libre\.png/gi, imgFree);
+        // 2. Reemplaza los textos exactos de Google Sheets por el icono correspondiente y negrita
+        resultado = resultado.replace(/Acci[oó]n\s*individual\s*:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
+        resultado = resultado.replace(/Dos\s*acciones\s*:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
+        resultado = resultado.replace(/Tres\s*acciones\s*:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
+        resultado = resultado.replace(/Reacci[oó]n\s*:/gi, `${imgReaction} <strong>Reacción:</strong>`);
+        resultado = resultado.replace(/Acci[oó]n\s*libre\s*:/gi, `${imgFree} <strong>Acción libre:</strong>`);
     
-        // 3. Aplica formato limpio a los títulos de acciones en el texto
-        resultado = resultado.replace(/(<img[^>]*pf-action-img[^>]*>)?\s*(Acci[oó]n individual:|Dos acciones:|Tres acciones:|Reacci[oó]n:|Acci[oó]n libre:)/gi, (match, imgExistente, textoAccion) => {
-            const textoNegrita = `<strong>${textoAccion}</strong>`;
-            const lower = textoAccion.toLowerCase();
-            
-            if (lower.includes('individual')) return `${imgExistente || imgSingle} ${textoNegrita}`;
-            if (lower.includes('dos'))        return `${imgExistente || imgTwo} ${textoNegrita}`;
-            if (lower.includes('tres'))       return `${imgExistente || imgThree} ${textoNegrita}`;
-            if (lower.includes('reacci'))     return `${imgExistente || imgReaction} ${textoNegrita}`;
-            if (lower.includes('libre'))      return `${imgExistente || imgFree} ${textoNegrita}`;
-            
-            return match;
-        });
-    
-        // 4. Reemplaza sintaxis de corchetes si las hubiera
+        // 3. (Opcional) Soporte por si usas corchetes en otros conjuros
         resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
         resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
         resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
