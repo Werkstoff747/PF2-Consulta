@@ -72,7 +72,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 18px 20px;
+            padding: 10px 15px; /* Reducido para compactar las zonas verdes */
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 20px;
             background: var(--header-bg);
@@ -82,17 +82,17 @@
         }
 
         .pf-main-logo {
-            max-width: 480px;
-            width: 90%;
+            max-width: 380px;
+            width: 85%;
             height: auto;
             display: block;
-            margin: 0 auto 12px auto;
+            margin: 0 auto 2px auto; /* Pegado casi sin espacio inferior */
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
         .theme-btn-top {
             position: absolute;
-            top: 12px;
+            top: 10px;
             right: 12px;
             background-color: rgba(255, 255, 255, 0.15);
             border: 1px solid var(--pf-gold);
@@ -117,14 +117,15 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: 3.8rem;           /* Casi el doble de grande */
             font-variant: small-caps;
             color: #ffffff !important;
-            letter-spacing: 2.5px;
+            letter-spacing: 2px;
             text-transform: lowercase;
-            line-height: 1.1;
-            margin-top: 0;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.6);
+            line-height: 1;
+            margin-top: -6px;            /* Ligera superposición/cercanía al logo */
+            margin-bottom: 4px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.7);
         }
 
         .controls {
@@ -485,10 +486,10 @@
             transform: translateY(-3px);
         }
 
-        @media (max-width: 600px) {
-            header { padding: 12px; }
-            .pf-main-logo { max-width: 280px; }
-            h1 { font-size: 1.4rem; }
+        @media (max-width: 768px) {
+            header { padding: 10px 8px; }
+            .pf-main-logo { max-width: 260px; }
+            h1 { font-size: 2.2rem; margin-top: -2px; }
         }
 
         footer {
