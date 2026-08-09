@@ -72,7 +72,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 15px; /* Reducido para compactar las zonas verdes */
+            padding: 8px 15px; /* Reducimos aún más para eliminar margen verde en los bordes */
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 20px;
             background: var(--header-bg);
@@ -82,11 +82,11 @@
         }
 
         .pf-main-logo {
-            max-width: 380px;
-            width: 85%;
+            max-width: 580px;         /* Logo significativamente más grande */
+            width: 95%;               /* Ocupa hasta el 95% del ancho disponible */
             height: auto;
             display: block;
-            margin: 0 auto 2px auto; /* Pegado casi sin espacio inferior */
+            margin: 0 auto -12px auto;/* Margen negativo para pegar las letras al logo */
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
@@ -117,13 +117,13 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3.8rem;           /* Casi el doble de grande */
-            font-variant: small-caps;
+            font-size: 3.2rem;         /* Letras mucho más grandes y potentes */
+            font-variant: small-caps;  /* Versalitas */
             color: #ffffff !important;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             text-transform: lowercase;
-            line-height: 1;
-            margin-top: -6px;            /* Ligera superposición/cercanía al logo */
+            line-height: 0.9;          /* Reducción de interlineado para pegar más el texto */
+            margin-top: 0;
             margin-bottom: 4px;
             text-shadow: 0 2px 6px rgba(0,0,0,0.7);
         }
@@ -488,8 +488,8 @@
 
         @media (max-width: 768px) {
             header { padding: 10px 8px; }
-            .pf-main-logo { max-width: 260px; }
-            h1 { font-size: 2.2rem; margin-top: -2px; }
+            .pf-main-logo { max-width: 320px; margin-bottom: -6px; }
+            h1 { font-size: 1.8rem; letter-spacing: 1.5px; }
         }
 
         footer {
@@ -636,45 +636,46 @@
     }
 
     function reemplazarIconosEnTexto(texto) {
-    if (!esValido(texto)) return '';
-    let resultado = texto;
+        if (!esValido(texto)) return '';
+        let resultado = texto;
 
-    const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
-    const imgTwo      = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
-    const imgThree    = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
-    const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
-    const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
+        const imgSingle   = '<img src="./icons/single_action.png" class="pf-action-img" alt="1 Acción">';
+        const imgTwo      = '<img src="./icons/two_action.png" class="pf-action-img" alt="2 Acciones">';
+        const imgThree    = '<img src="./icons/three_action.png" class="pf-action-img" alt="3 Acciones">';
+        const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
+        const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
 
-    // 1. Reemplaza cualquier etiqueta <img> previa del Excel que apunte a nombres antiguos o sin ruta
-    resultado = resultado.replace(/<img\s+[^>]*1\s*Acci[oó]n[^>]*>/gi, imgSingle);
-    resultado = resultado.replace(/<img\s+[^>]*2\s*Acci[oó]n[^>]*>/gi, imgTwo);
-    resultado = resultado.replace(/<img\s+[^>]*3\s*Acci[oó]n[^>]*>/gi, imgThree);
-    resultado = resultado.replace(/<img\s+[^>]*Reacci[oó]n[^>]*>/gi, imgReaction);
-    resultado = resultado.replace(/<img\s+[^>]*Libre[^>]*>/gi, imgFree);
+        // 1. Reemplaza cualquier etiqueta <img> previa del Excel que apunte a nombres antiguos o sin ruta
+        resultado = resultado.replace(/<img\s+[^>]*1\s*Acci[oó]n[^>]*>/gi, imgSingle);
+        resultado = resultado.replace(/<img\s+[^>]*2\s*Acci[oó]n[^>]*>/gi, imgTwo);
+        resultado = resultado.replace(/<img\s+[^>]*3\s*Acci[oó]n[^>]*>/gi, imgThree);
+        resultado = resultado.replace(/<img\s+[^>]*Reacci[oó]n[^>]*>/gi, imgReaction);
+        resultado = resultado.replace(/<img\s+[^>]*Libre[^>]*>/gi, imgFree);
 
-    // 2. Aplica formato en negrita a las cabeceras y asegura un solo icono
-    resultado = resultado.replace(/(<img[^>]*pf-action-img[^>]*>)?\s*(Acci[oó]n individual:|Dos acciones:|Tres acciones:|Reacci[oó]n:|Acci[oó]n libre:)/gi, (match, imgExistente, textoAccion) => {
-        const textoNegrita = `<strong>${textoAccion}</strong>`;
-        const lower = textoAccion.toLowerCase();
-        
-        if (lower.includes('individual')) return `${imgExistente || imgSingle} ${textoNegrita}`;
-        if (lower.includes('dos'))        return `${imgExistente || imgTwo} ${textoNegrita}`;
-        if (lower.includes('tres'))       return `${imgExistente || imgThree} ${textoNegrita}`;
-        if (lower.includes('reacci'))     return `${imgExistente || imgReaction} ${textoNegrita}`;
-        if (lower.includes('libre'))      return `${imgExistente || imgFree} ${textoNegrita}`;
-        
-        return match;
-    });
+        // 2. Aplica formato en negrita a las cabeceras y asegura un solo icono
+        resultado = resultado.replace(/(<img[^>]*pf-action-img[^>]*>)?\s*(Acci[oó]n individual:|Dos acciones:|Tres acciones:|Reacci[oó]n:|Acci[oó]n libre:)/gi, (match, imgExistente, textoAccion) => {
+            const textoNegrita = `<strong>${textoAccion}</strong>`;
+            const lower = textoAccion.toLowerCase();
+            
+            if (lower.includes('individual')) return `${imgExistente || imgSingle} ${textoNegrita}`;
+            if (lower.includes('dos'))        return `${imgExistente || imgTwo} ${textoNegrita}`;
+            if (lower.includes('tres'))       return `${imgExistente || imgThree} ${textoNegrita}`;
+            if (lower.includes('reacci'))     return `${imgExistente || imgReaction} ${textoNegrita}`;
+            if (lower.includes('libre'))      return `${imgExistente || imgFree} ${textoNegrita}`;
+            
+            return match;
+        });
 
-    // 3. Reemplaza códigos con corchetes [single-action], etc.
-    resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
-    resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
-    resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
-    resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
-    resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
+        // 3. Reemplaza sintaxis con corchetes [single-action], etc.
+        resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
+        resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
+        resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
+        resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
+        resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
 
-    return resultado;
-}
+        return resultado;
+    }
+
     function toggleCardExpand(btn) {
         const expandedContent = btn.nextElementSibling;
         const isHidden = window.getComputedStyle(expandedContent).display === 'none';
