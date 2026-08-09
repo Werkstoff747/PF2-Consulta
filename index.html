@@ -647,22 +647,15 @@
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
         const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
     
-        // 1. Limpia cualquier etiqueta <img> rota o texto previo que se haya colado
+        // Limpieza de cualquier resto antiguo
         resultado = resultado.replace(/<img[^>]*>/gi, '');
     
-        // 2. Reemplaza los textos exactos de Google Sheets por el icono correspondiente y negrita
-        resultado = resultado.replace(/Acci[oó]n\s*individual\s*:/gi, `${imgSingle} <strong>Acción individual:</strong>`);
-        resultado = resultado.replace(/Dos\s*acciones\s*:/gi, `${imgTwo} <strong>Dos acciones:</strong>`);
-        resultado = resultado.replace(/Tres\s*acciones\s*:/gi, `${imgThree} <strong>Tres acciones:</strong>`);
-        resultado = resultado.replace(/Reacci[oó]n\s*:/gi, `${imgReaction} <strong>Reacción:</strong>`);
-        resultado = resultado.replace(/Acci[oó]n\s*libre\s*:/gi, `${imgFree} <strong>Acción libre:</strong>`);
-    
-        // 3. (Opcional) Soporte por si usas corchetes en otros conjuros
-        resultado = resultado.replace(/\[?three[-_]actions?\]?/gi, imgThree);
-        resultado = resultado.replace(/\[?two[-_]actions?\]?/gi, imgTwo);
-        resultado = resultado.replace(/\[?single[-_]actions?\]?/gi, imgSingle);
-        resultado = resultado.replace(/\[?reactions?\]?/gi, imgReaction);
-        resultado = resultado.replace(/\[?free[-_]actions?\]?/gi, imgFree);
+        // Reemplazo basado en tus nuevos corchetes profesionales
+        resultado = resultado.replace(/\[1\]/g, `${imgSingle} <strong>Acción individual:</strong>`);
+        resultado = resultado.replace(/\[2\]/g, `${imgTwo} <strong>Dos acciones:</strong>`);
+        resultado = resultado.replace(/\[3\]/g, `${imgThree} <strong>Tres acciones:</strong>`);
+        resultado = resultado.replace(/\[reaccion\]/gi, `${imgReaction} <strong>Reacción:</strong>`);
+        resultado = resultado.replace(/\[libre\]/gi, `${imgFree} <strong>Acción libre:</strong>`);
     
         return resultado;
     }
