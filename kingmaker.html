@@ -11,7 +11,7 @@
     <!-- Google Fonts: Cinzel para títulos y Lora para textos -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
-    <!-- Librería PapaParse por si vas a leer datos de un CSV -->
+    <!-- Librería PapaParse para leer datos del CSV de Google Sheets -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
@@ -26,6 +26,7 @@
             --tag-bg: #5a181b;
             --tag-text: #ffffff;
             --shadow: rgba(0, 0, 0, 0.15);
+            --text-muted: #666666;
         }
 
         /* Tema Oscuro */
@@ -39,6 +40,7 @@
             --tag-bg: #7a2226;
             --tag-text: #ffffff;
             --shadow: rgba(0, 0, 0, 0.5);
+            --text-muted: #a6b2a9;
         }
 
         body {
@@ -113,11 +115,117 @@
             background: rgba(0, 0, 0, 0.5);
         }
 
-        /* Estilos generales para imágenes de acciones en texto */
-        .pf-action-img {
-            height: 1em;
-            vertical-align: middle;
-            margin: 0 2px;
+        /* Controles y Buscador */
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 18px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--pf-gold);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-family: 'Lora', serif;
+            outline: none;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Contador de resultados y mensajes de estado */
+        .results-counter {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            font-style: italic;
+            text-align: center;
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--pf-gold);
+            padding: 40px;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Rejilla y Tarjetas de Peones */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 18px;
+            box-shadow: 0 3px 8px var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--pf-gold);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .card-title-es {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .card-title-en {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 6px;
+        }
+
+        .card-stats {
+            font-size: 0.95rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: var(--pf-gold);
+        }
+
+        .tag-bolsa {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -131,13 +239,96 @@
             <h1>Kingmaker Compendio</h1>
         </header>
 
-        <!-- Contenido principal (Aquí montaremos la lógica de peones y Google Sheets) -->
+        <!-- Buscador -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar peón por nombre en inglés o castellano..." oninput="filterPeones()">
+            </div>
+        </div>
+
+        <div id="resultsCounter" class="results-counter"></div>
+        
+        <!-- Contenido principal -->
         <main id="main-content">
-            <p style="text-align: center; font-style: italic;">Base estética de Kingmaker cargada correctamente. ¡Dime qué estructura o buscador necesitas que active!</p>
+            <div id="loading">Consultando el arcón de peones de Google Sheets...</div>
+            <div class="grid" id="peonesGrid"></div>
         </main>
     </div>
 
     <script>
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo9ECEoZntqgSegnZg5pQm8hUd0_d0yxt4UujXkt-7cyQ1PYJSuRto43pXBM1StT8OrC4Pknt3PQUt/pub?output=csv";
+        
+        let allPeones = [];
+
+        // Cargar los datos del Google Sheet al iniciar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    allPeones = results.data;
+                    document.getElementById('loading').style.display = 'none';
+                    renderPeones(allPeones);
+                },
+                error: function(err) {
+                    document.getElementById('loading').textContent = "Error al conectar con el Google Sheet de peones.";
+                    console.error(err);
+                }
+            });
+        });
+
+        // Función para renderizar la lista de tarjetas
+        function renderPeones(peones) {
+            const grid = document.getElementById('peonesGrid');
+            const counter = document.getElementById('resultsCounter');
+            grid.innerHTML = '';
+
+            counter.textContent = `Mostrando ${peones.length} peón/es`;
+
+            if (peones.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic;">No se ha encontrado ningún peón con ese nombre.</p>`;
+                return;
+            }
+
+            peones.forEach(p => {
+                // Mapeo exacto de tus columnas: Name Pawn, PawnNº, PeónCantidad, Tamaño, Nombre Peón, Bolsa
+                const nameEn = p['Name Pawn'] || 'Desconocido';
+                const pawnNum = p['PawnNº'] || '-';
+                const cantidad = p['PeónCantidad'] || '1';
+                const tamano = p['Tamaño'] || '-';
+                const nameEs = p['Nombre Peón'] || 'Sin traducir';
+                const bolsa = p['Bolsa'] || 'Sin asignar';
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-title-es">${nameEs}</div>
+                    <div class="card-title-en">${nameEn}</div>
+                    <div class="card-stats">
+                        <div class="stat-row"><span class="stat-label">Nº de Peón:</span> <span>${pawnNum}</span></div>
+                        <div class="stat-row"><span class="stat-label">Unidades:</span> <span>${cantidad}</span></div>
+                        <div class="stat-row"><span class="stat-label">Tamaño:</span> <span>${tamano}</span></div>
+                        <div class="stat-row" style="align-items: center; margin-top: 4px;"><span class="stat-label">Bolsa:</span> <span class="tag-bolsa">${bolsa}</span></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Lógica del buscador en tiempo real (busca en Name Pawn y Nombre Peón)
+        function filterPeones() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            const filtered = allPeones.filter(p => {
+                const en = (p['Name Pawn'] || '').toLowerCase();
+                const es = (p['Nombre Peón'] || '').toLowerCase();
+                return en.includes(query) || es.includes(query);
+            });
+
+            renderPeones(filtered);
+        }
+
         // Lógica para alternar el Modo Oscuro / Claro y guardar la preferencia
         function toggleTheme() {
             const body = document.body;
