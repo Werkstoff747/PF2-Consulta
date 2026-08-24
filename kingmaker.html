@@ -369,6 +369,13 @@
         }
 
         // Función para renderizar la lista de tarjetas
+        // Modificada para leer las columnas por su posición exacta si falla el nombre de la cabecera:
+        // Columna A (0): Name Pawn
+        // Columna B (1): PawnNº (Número de peón)
+        // Columna C (2): PeónCantidad (Unidades)
+        // Columna D (3): Tamaño
+        // Columna E (4): Nombre Peón
+        // Columna F (5): Bolsa
         function renderPeones(peones) {
             const grid = document.getElementById('peonesGrid');
             const counter = document.getElementById('resultsCounter');
@@ -382,13 +389,15 @@
             }
 
             peones.forEach(p => {
-                // Mapeo de columnas: Name Pawn, PawnNº (Columna B), PeónCantidad, Tamaño, Nombre Peón, Bolsa
-                const nameEn = p['Name Pawn'] || 'Desconocido';
-                const pawnNum = p['PawnNº'] || '-';
-                const cantidad = p['PeónCantidad'] || '1';
-                const tamano = p['Tamaño'] || '-';
-                const nameEs = p['Nombre Peón'] || 'Sin traducir';
-                const bolsa = p['Bolsa'] || 'Sin asignar';
+                // Obtenemos las claves (cabeceras) del objeto para asegurar lectura por posición si hace falta
+                const keys = Object.keys(p);
+
+                const nameEn = p['Name Pawn'] || p[keys[0]] || 'Desconocido';
+                const pawnNum = p['PawnNº'] || p['Pawn Nº'] || p[keys[1]] || '-';
+                const cantidad = p['PeónCantidad'] || p[keys[2]] || '1';
+                const tamano = p['Tamaño'] || p[keys[3]] || '-';
+                const nameEs = p['Nombre Peón'] || p[keys[4]] || 'Sin traducir';
+                const bolsa = p['Bolsa'] || p[keys[5]] || 'Sin asignar';
 
                 const card = document.createElement('div');
                 card.className = 'card';
