@@ -3,57 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kingmaker — Compendio de Pathfinder 2e</title>
+    <title>Kingmaker Compendio — Pathfinder 2e</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./icons/Pfav.png">
 
-    <!-- Google Fonts: Cinzel para títulos y Lora para textos -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Roboto, Cinzel y Roboto Condensed -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Roboto+Condensed:wght@700&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- Librería PapaParse para leer datos del CSV de Google Sheets -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
-        /* Variables de Colores y Estilos (Tema por defecto: Claro / Pergamino) */
+        /* MODO DÍA / CLARO (Idéntico a index.html) */
         :root {
-            --bg-color: #f4f1ea;
-            --text-color: #2b2b2b;
-            --header-bg: #0b3b24;
-            --pf-gold: #c5a059;
-            --card-bg: #fffcf5;
-            --card-border: #d4c5b9;
+            --bg-color: #dfd8cc;
+            --card-bg: #ffffff;
+            --card-border: #8c8375;
+            --pf-burgundy: #580c1f;
+            --pf-uncommon: #8d4838;
+            --pf-class: #063d23;
+            --pf-gold: #b58d3d;
+            --pf-dark: #111111;
+            --text-muted: #555555;
+            --line-color: #222222;
+            --header-bg: #063d23;
             --tag-bg: #5a181b;
             --tag-text: #ffffff;
             --shadow: rgba(0, 0, 0, 0.15);
-            --text-muted: #666666;
         }
 
-        /* Tema Oscuro */
-        [data-theme="dark"] {
-            --bg-color: #121815;
-            --text-color: #e0e0e0;
-            --header-bg: #062214;
-            --pf-gold: #d4af37;
-            --card-bg: #1a231e;
-            --card-border: #2d3b32;
+        /* MODO NOCHE / OSCURO */
+        body.dark-mode {
+            --bg-color: #0f1411;
+            --card-bg: #181d19;
+            --card-border: #38453c;
+            --pf-burgundy: #6b1428;
+            --pf-uncommon: #9e4f3c;
+            --pf-class: #0d5432;
+            --pf-gold: #c6a15a;
+            --pf-dark: #e8e9e5;
+            --text-muted: #a6b2a9;
+            --line-color: #445448;
+            --header-bg: linear-gradient(180deg, #063d23 0%, #111813 100%);
             --tag-bg: #7a2226;
             --tag-text: #ffffff;
             --shadow: rgba(0, 0, 0, 0.5);
-            --text-muted: #a6b2a9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Lora', serif;
+            font-family: 'Roboto', sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
+            color: var(--pf-dark);
+            line-height: 1.5;
             padding: 20px;
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
         }
 
@@ -64,55 +78,61 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 6px 15px 10px 15px;
+            padding: 10px 15px;
             border-bottom: 2px solid var(--pf-gold);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             background: var(--header-bg);
             border-radius: 6px;
             text-align: center;
-            box-shadow: 0 4px 12px var(--shadow);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
 
         .pf-main-logo {
-            max-width: 440px;
-            width: 85%;
+            max-width: 320px;
+            width: 75%;
             height: auto;
             display: block;
             clip-path: inset(18% 0% 18% 0%);
-            margin: -25px auto -35px auto;
+            margin: -22px auto -32px auto;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3.2rem;
+            font-size: 2.5rem;
             font-variant: small-caps;
             color: #ffffff !important;
             letter-spacing: 2px;
             text-transform: lowercase;
-            line-height: 0.9;
+            line-height: 1;
             margin-top: 0;
-            margin-bottom: 2px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Botón de Cambio de Tema (Modo Oscuro/Claro) */
-        .theme-toggle {
+        /* Botón de Cambio de Tema */
+        .theme-btn-top {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.3);
+            top: 12px;
+            right: 12px;
+            background-color: rgba(255, 255, 255, 0.15);
             border: 1px solid var(--pf-gold);
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 50%;
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: background 0.2s;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+            z-index: 10;
         }
 
-        .theme-toggle:hover {
-            background: rgba(0, 0, 0, 0.5);
+        .theme-btn-top:hover {
+            transform: scale(1.05);
+            background-color: var(--pf-gold);
+            color: #000;
         }
 
         /* Controles, Buscador y Botonera de Bolsas */
@@ -131,13 +151,13 @@
 
         .search-box input {
             width: 100%;
-            padding: 12px 18px;
+            padding: 10px 16px;
             background-color: var(--card-bg);
             border: 2px solid var(--pf-gold);
             border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1.1rem;
-            font-family: 'Lora', serif;
+            color: var(--pf-dark);
+            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
             outline: none;
             box-shadow: 0 2px 8px var(--shadow);
         }
@@ -159,12 +179,12 @@
         .bag-btn {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            color: var(--text-color);
+            color: var(--pf-dark);
             padding: 6px 14px;
             border-radius: 4px;
             cursor: pointer;
             font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.2s;
             box-shadow: 0 2px 4px var(--shadow);
@@ -172,15 +192,15 @@
 
         .bag-btn:hover, .bag-btn.active {
             background-color: var(--pf-gold);
-            color: #121815;
+            color: #111111;
             border-color: var(--pf-gold);
         }
 
-        /* Contador de resultados y mensajes de estado */
+        /* Contador de resultados */
         .results-counter {
             font-size: 0.95rem;
             color: var(--text-muted);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-style: italic;
             text-align: center;
         }
@@ -218,10 +238,10 @@
 
         .card-title-es {
             font-family: 'Cinzel', serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 4px;
+            color: var(--pf-dark);
+            margin-bottom: 2px;
         }
 
         .card-title-en {
@@ -258,14 +278,25 @@
             font-size: 0.85rem;
             font-weight: bold;
         }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 50px;
+        }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
     <div class="container">
         <!-- Cabecera -->
         <header>
-            <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+            <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
+                <span id="themeIcon">🌙</span>
+            </button>
             <img src="./icons/PF2Logo.webp" alt="Pathfinder" class="pf-main-logo">
             <h1>Kingmaker Compendio</h1>
         </header>
@@ -286,6 +317,10 @@
             <div id="loading">Consultando el arcón de peones de Google Sheets...</div>
             <div class="grid" id="peonesGrid"></div>
         </main>
+
+        <footer>
+            Kingmaker Compendio Pathfinder 2e — Maquetado Remasterizado.
+        </footer>
     </div>
 
     <script>
@@ -296,6 +331,12 @@
 
         // Cargar los datos del Google Sheet al iniciar la página
         window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('pf_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+            }
+
             Papa.parse(SHEET_CSV_URL, {
                 download: true,
                 header: true,
@@ -313,7 +354,7 @@
             });
         });
 
-        // Detectar bolsas únicas de forma automática en el Google Sheet y crear la botonera
+        // Detectar bolsas únicas de forma automática y crear la botonera
         function generateBagButtons(peones) {
             const container = document.getElementById('bagsButtonsContainer');
             const bagsSet = new Set();
@@ -382,7 +423,6 @@
             peones.forEach(p => {
                 const keys = Object.keys(p);
 
-                // Mapeo ajustado con la columna "Número Peón" y alternativa por posición de columna
                 const nameEn = p['Name Pawn'] || p[keys[0]] || 'Desconocido';
                 const pawnNum = p['Número Peón'] || p['Número'] || p['Nº Peón'] || p[keys[1]] || '-';
                 const cantidad = p['PeónCantidad'] || p[keys[2]] || '1';
@@ -406,17 +446,19 @@
             });
         }
 
-        // Lógica para alternar el Modo Oscuro / Claro y guardar la preferencia
+        // Lógica de cambio de tema con persistencia
         function toggleTheme() {
             const body = document.body;
-            const btn = document.getElementById('themeToggleBtn');
+            const themeIcon = document.getElementById('themeIcon');
             
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                btn.textContent = '☀️';
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('pf_theme', 'dark');
+                themeIcon.textContent = '☀️';
             } else {
-                body.setAttribute('data-theme', 'dark');
-                btn.textContent = '🌙';
+                localStorage.setItem('pf_theme', 'light');
+                themeIcon.textContent = '🌙';
             }
         }
     </script>
