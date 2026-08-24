@@ -115,11 +115,13 @@
             background: rgba(0, 0, 0, 0.5);
         }
 
-        /* Controles y Buscador */
+        /* Controles, Buscador y Botonera de Bolsas */
         .controls {
             margin-bottom: 25px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
         }
 
         .search-box {
@@ -143,6 +145,35 @@
         .search-box input::placeholder {
             color: var(--text-muted);
             font-style: italic;
+        }
+
+        /* Botonera de Bolsas Dinámica */
+        .bags-filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 900px;
+        }
+
+        .bag-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .bag-btn:hover, .bag-btn.active {
+            background-color: var(--pf-gold);
+            color: #121815;
+            border-color: var(--pf-gold);
         }
 
         /* Contador de resultados y mensajes de estado */
@@ -239,11 +270,13 @@
             <h1>Kingmaker Compendio</h1>
         </header>
 
-        <!-- Buscador -->
+        <!-- Controles de búsqueda y filtrado -->
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar peón por nombre en inglés o castellano..." oninput="filterPeones()">
+                <input type="text" id="searchInput" placeholder="Buscar peón por nombre en inglés o castellano..." oninput="applyFilters()">
             </div>
+            <!-- Botonera generada dinámicamente para las bolsas -->
+            <div class="bags-filter-container" id="bagsButtonsContainer"></div>
         </div>
 
         <div id="resultsCounter" class="results-counter"></div>
@@ -259,6 +292,7 @@
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRo9ECEoZntqgSegnZg5pQm8hUd0_d0yxt4UujXkt-7cyQ1PYJSuRto43pXBM1StT8OrC4Pknt3PQUt/pub?output=csv";
         
         let allPeones = [];
+        let currentSelectedBag = 'all';
 
         // Cargar los datos del Google Sheet al iniciar la página
         window.addEventListener('DOMContentLoaded', () => {
@@ -269,6 +303,7 @@
                 complete: function(results) {
                     allPeones = results.data;
                     document.getElementById('loading').style.display = 'none';
+                    generateBagButtons(allPeones);
                     renderPeones(allPeones);
                 },
                 error: function(err) {
@@ -277,6 +312,61 @@
                 }
             });
         });
+
+        // Detectar bolsas únicas de forma automática en el Google Sheet y crear la botonera
+        function generateBagButtons(peones) {
+            const container = document.getElementById('bagsButtonsContainer');
+            const bagsSet = new Set();
+
+            peones.forEach(p => {
+                const bolsa = p['Bolsa'] ? p['Bolsa'].trim() : '';
+                if (bolsa) bagsSet.add(bolsa);
+            });
+
+            // Ordenar las bolsas alfabéticamente/numéricamente si es posible
+            const uniqueBags = Array.from(bagsSet).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+
+            let html = `<button class="bag-btn active" data-bag="all" onclick="filterByBag('all')">Todas las Bolsas</button>`;
+            uniqueBags.forEach(bag => {
+                html += `<button class="bag-btn" data-bag="${bag}" onclick="filterByBag('${bag}')">${bag}</button>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Seleccionar bolsa desde la botonera
+        function filterByBag(bagName) {
+            currentSelectedBag = bagName;
+            
+            // Actualizar clases activas en los botones
+            document.querySelectorAll('.bag-btn').forEach(btn => {
+                if (btn.getAttribute('data-bag') === bagName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            applyFilters();
+        }
+
+        // Filtro combinado (Buscador de texto + Botonera de bolsa)
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = allPeones.filter(p => {
+                const nameEn = (p['Name Pawn'] || '').toLowerCase();
+                const nameEs = (p['Nombre Peón'] || '').toLowerCase();
+                const bag = (p['Bolsa'] || '').trim();
+
+                const matchesQuery = nameEn.includes(query) || nameEs.includes(query);
+                const matchesBag = (currentSelectedBag === 'all') || (bag === currentSelectedBag);
+
+                return matchesQuery && matchesBag;
+            });
+
+            renderPeones(filtered);
+        }
 
         // Función para renderizar la lista de tarjetas
         function renderPeones(peones) {
@@ -287,12 +377,12 @@
             counter.textContent = `Mostrando ${peones.length} peón/es`;
 
             if (peones.length === 0) {
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic;">No se ha encontrado ningún peón con ese nombre.</p>`;
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic;">No se ha encontrado ningún peón con los filtros seleccionados.</p>`;
                 return;
             }
 
             peones.forEach(p => {
-                // Mapeo exacto de tus columnas: Name Pawn, PawnNº, PeónCantidad, Tamaño, Nombre Peón, Bolsa
+                // Mapeo de columnas: Name Pawn, PawnNº (Columna B), PeónCantidad, Tamaño, Nombre Peón, Bolsa
                 const nameEn = p['Name Pawn'] || 'Desconocido';
                 const pawnNum = p['PawnNº'] || '-';
                 const cantidad = p['PeónCantidad'] || '1';
@@ -314,19 +404,6 @@
                 `;
                 grid.appendChild(card);
             });
-        }
-
-        // Lógica del buscador en tiempo real (busca en Name Pawn y Nombre Peón)
-        function filterPeones() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            
-            const filtered = allPeones.filter(p => {
-                const en = (p['Name Pawn'] || '').toLowerCase();
-                const es = (p['Nombre Peón'] || '').toLowerCase();
-                return en.includes(query) || es.includes(query);
-            });
-
-            renderPeones(filtered);
         }
 
         // Lógica para alternar el Modo Oscuro / Claro y guardar la preferencia
