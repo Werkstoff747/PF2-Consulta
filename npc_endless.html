@@ -404,71 +404,44 @@
     </div>
 
     <script>
-        // Base de datos de cartas integrada localmente
         const allNpcs = [
             {
-                "Card ID": "CARD #36",
-                "Trait": "DANCER",
-                "Role": "GREGARIOUS",
-                "S Name": "Venue",
+                "Card ID": "CARD #36", "Trait": "DANCER", "Role": "GREGARIOUS", "S Name": "Venue",
                 "S0": "Private patron", "S1": "Private patron", "S2": "Street corner", "S3": "Local tavern", "S4": "Theater", "S5": "Theater", "S6": "The court",
-                "Secret": "In truth, this NPC is serving as a distraction while a crime is being",
-                "Secret Condition": "If H is 1, apply the secret.",
-                "Hook Name": "Distraction",
-                "H0": "Someone else's clothes", "H1": "Pesky stain", "H2": "Dropped sock", "H3": "Fallen basket", "H4": "Stolen item", "H5": "Stolen item", "H6": "Stolen item"
+                "Secret": "In truth, this NPC is serving as a distraction while a crime is being", "Secret Condition": "If H is 1, apply the secret.",
+                "Hook Name": "Distraction", "H0": "Someone else's clothes", "H1": "Pesky stain", "H2": "Dropped sock", "H3": "Fallen basket", "H4": "Stolen item", "H5": "Stolen item", "H6": "Stolen item"
             },
             {
-                "Card ID": "CARD #42",
-                "Trait": "JUGGLER",
-                "Role": "OUT OF CONTROL",
-                "S Name": "Object",
+                "Card ID": "CARD #42", "Trait": "JUGGLER", "Role": "OUT OF CONTROL", "S Name": "Object",
                 "S0": "Alc. Bombs", "S1": "Torches", "S2": "Rings", "S3": "Balls", "S4": "Clubs", "S5": "Knives", "S6": "Knives",
-                "Secret": "Someone has poisoned this NPC and it is only a matter of time before they collapse or hurt themselves.",
-                "Secret Condition": "If H is 0, apply the secret.",
-                "Hook Name": "What is it?",
-                "H0": "Dull weapon", "H1": "Dented armor", "H2": "Torn clothes", "H3": "Broken tool", "H4": "Small toy", "H5": "Magic item", "H6": "Magic item"
+                "Secret": "Someone has poisoned this NPC and it is only a matter of time before they collapse or hurt themselves.", "Secret Condition": "If H is 0, apply the secret.",
+                "Hook Name": "What is it?", "H0": "Dull weapon", "H1": "Dented armor", "H2": "Torn clothes", "H3": "Broken tool", "H4": "Small toy", "H5": "Magic item", "H6": "Magic item"
             },
             {
-                "Card ID": "CARD #47",
-                "Trait": "BARBER",
-                "Role": "CONFUSED",
-                "S Name": "Specialty",
+                "Card ID": "CARD #47", "Trait": "BARBER", "Role": "CONFUSED", "S Name": "Specialty",
                 "S0": "Surgery", "S1": "Treat poison", "S2": "Stitch wounds", "S3": "Cuts/shaves", "S4": "Pull teeth", "S5": "Treat disease", "S6": "Treat disease",
-                "Secret": "This character is visiting from a far away place, using magic to speak and read the local language. Unfortunately, that magic has failed and they cannot...",
-                "Secret Condition": "If S is 3, apply the secret.",
-                "Hook Name": "Cleaning Up",
-                "H0": "Tidy area", "H1": "Tidy area", "H2": "Tidy area", "H3": "Tidy area", "H4": "Tidy area", "H5": "Tidy area", "H6": "Tidy area"
+                "Secret": "This character is visiting from a far away place, using magic to speak and read the local language. Unfortunately, that magic has failed and they cannot...", "Secret Condition": "If S is 3, apply the secret.",
+                "Hook Name": "Cleaning Up", "H0": "Tidy area", "H1": "Tidy area", "H2": "Tidy area", "H3": "Tidy area", "H4": "Tidy area", "H5": "Tidy area", "H6": "Tidy area"
             },
             {
-                "Card ID": "CARD #65",
-                "Trait": "EXPLORER",
-                "Role": "UNRELIABLE",
-                "S Name": "Goal",
+                "Card ID": "CARD #65", "Trait": "EXPLORER", "Role": "UNRELIABLE", "S Name": "Goal",
                 "S0": "Travel planes", "S1": "Summit peaks", "S2": "Catalog beasts", "S3": "See the world", "S4": "Chart unknown", "S5": "Explore ruins", "S6": "Explore ruins",
-                "Secret": "This character is living a double life, with two families, two jobs, and two sets of friends. They are just barely...",
-                "Secret Condition": "If S is 2, apply the secret.",
-                "Hook Name": "Mending",
-                "H0": "Dull weapon", "H1": "Dented armor", "H2": "Torn clothes", "H3": "Broken tool", "H4": "Small toy", "H5": "Magic item", "H6": "Magic item"
+                "Secret": "This character is living a double life, with two families, two jobs, and two sets of friends. They are just barely...", "Secret Condition": "If S is 2, apply the secret.",
+                "Hook Name": "Mending", "H0": "Dull weapon", "H1": "Dented armor", "H2": "Torn clothes", "H3": "Broken tool", "H4": "Small toy", "H5": "Magic item", "H6": "Magic item"
             },
             {
-                "Card ID": "CARD #93",
-                "Trait": "LUMBERJACK",
-                "Role": "MISCREANT",
-                "S Name": "Job",
+                "Card ID": "CARD #93", "Trait": "LUMBERJACK", "Role": "MISCREANT", "S Name": "Job",
                 "S0": "Steal from PCs", "S1": "Plant evidence", "S2": "Fence goods", "S3": "Burglary", "S4": "Make a contact", "S5": "Recruit member", "S6": "Recruit member",
-                "Secret": "This NPC desperately wants to become a bard, focusing on comedy and pranks, maybe even hoping to one day become a royal jester, but there’s just one problem. They’re not very funny.",
-                "Secret Condition": "",
-                "Hook Name": "Laundry Day",
-                "H0": "Someone else’s clothes", "H1": "Pesky stain", "H2": "Dropped sock", "H3": "Fallen basket", "H4": "Stolen item", "H5": "Stolen item", "H6": "Stolen item"
+                "Secret": "This NPC desperately wants to become a bard, focusing on comedy and pranks, maybe even hoping to one day become a royal jester, but there’s just one problem. They’re not very funny.", "Secret Condition": "",
+                "Hook Name": "Laundry Day", "H0": "Someone else’s clothes", "H1": "Pesky stain", "H2": "Dropped sock", "H3": "Fallen basket", "H4": "Stolen item", "H5": "Stolen item", "H6": "Stolen item"
             }
         ];
 
-        // Base de datos de nombres y ancestrías integrada localmente
         const allNamesData = [
-            { "Ancestry": "Human (Taldan)", "Names": "Asennal, Rochaide, Aysobel, Shonara, Brinna, Thertet, Elklynn, Thunvial, Jaimelle, Vivici, Orlalessa, Wendl" },
-            { "Ancestry": "Human (General)", "Names": "Milgria, Vanna, Muscan, Wilendithas, Bado, Kirkired, Cardanta, Kunda, Dondrina, Lirma, Gredda, Nomera, Guon, Sol, Ikko, Stalla" },
-            { "Ancestry": "Dwarf / General", "Names": "Dezoc, Nemdal, Feg, Omgot, Frudhiffs, Scrud, Klug, Soot, Leb, Thorg, Manter, Wendle" },
-            { "Ancestry": "Kobold", "Names": "Azmak, Parvan, Derukal, Skirsos, Jekkajak, Urkak, Kirrok, Vroklan, Kriktos, Yaggest, Mirkol, Zgaz" }
+            { "Ancestry": "Gnome (Mwangi)", "Names": "Almina Piloga, Aurilara Seentes, Calnara Swamilia, Engwede Tarek, Furenda Taweo, Neji Wigna" },
+            { "Ancestry": "Gnome (Chelaxian)", "Names": "Bertome Poldanlin, Catrelle Poshment, Corgaide Sarene, Dillantri Taborwin, Noosie Wandanda, Pevara Zatqualmie" },
+            { "Ancestry": "Ratfolk", "Names": "Berbs Lolo, Chonan Nocus, Jass Ringla, Jix Sursin, Kalee Tali, Knagi Zess" },
+            { "Ancestry": "Goblin (Duskwalker)", "Names": "Clush Merma, Dordor Nudral, Drina Renbit, Fingersnap Seksek, Greenga Yappa, Luxken Yezvig" }
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -499,7 +472,6 @@
             if (allNpcs.length === 0) return;
 
             const randomCard = allNpcs[Math.floor(Math.random() * allNpcs.length)];
-            
             const randomRow = allNamesData[Math.floor(Math.random() * allNamesData.length)];
             const ancestryName = randomRow['Ancestry'];
             const nameList = randomRow['Names'].split(', ');
