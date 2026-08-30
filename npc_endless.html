@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck of Endless NPCs — Pathfinder 2e</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./icons/Pfav.png">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Roboto+Condensed:wght@700&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- PapaParse para leer datos CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #dfd8cc;
+            --card-bg: #ffffff;
+            --card-border: #8c8375;
+            --pf-burgundy: #580c1f;
+            --pf-uncommon: #8d4838;
+            --pf-class: #063d23;
+            --pf-gold: #b58d3d;
+            --pf-dark: #111111;
+            --text-muted: #555555;
+            --line-color: #222222;
+            --header-bg: #063d23;
+            --tag-bg: #5a181b;
+            --tag-text: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode {
+            --bg-color: #0f1411;
+            --card-bg: #181d19;
+            --card-border: #38453c;
+            --pf-burgundy: #6b1428;
+            --pf-uncommon: #9e4f3c;
+            --pf-class: #0d5432;
+            --pf-gold: #c6a15a;
+            --pf-dark: #e8e9e5;
+            --text-muted: #a6b2a9;
+            --line-color: #445448;
+            --header-bg: linear-gradient(180deg, #063d23 0%, #111813 100%);
+            --tag-bg: #7a2226;
+            --tag-text: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--pf-dark);
+            line-height: 1.5;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        header {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 15px;
+            border-bottom: 2px solid var(--pf-gold);
+            margin-bottom: 25px;
+            background: var(--header-bg);
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+        }
+
+        .pf-main-logo {
+            max-width: 320px;
+            width: 75%;
+            height: auto;
+            display: block;
+            clip-path: inset(18% 0% 18% 0%);
+            margin: -22px auto -32px auto;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.3rem;
+            font-variant: small-caps;
+            color: #ffffff !important;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+            line-height: 1;
+            margin-top: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .theme-btn-top {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--pf-gold);
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .theme-btn-top:hover {
+            transform: scale(1.05);
+            background-color: var(--pf-gold);
+            color: #000;
+        }
+
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--pf-gold);
+            border-radius: 6px;
+            color: var(--pf-dark);
+            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .results-counter {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-style: italic;
+            text-align: center;
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--pf-gold);
+            padding: 40px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 18px;
+            box-shadow: 0 3px 8px var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--pf-gold);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .card-title-es {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--pf-dark);
+            margin-bottom: 2px;
+        }
+
+        .card-title-en {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 6px;
+        }
+
+        .card-stats {
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: var(--pf-gold);
+            white-space: nowrap;
+        }
+
+        .tag-role {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <button class="theme-btn-top" id="themeToggleBtn" onclick="toggleTheme()" title="Cambiar tema">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <img src="./icons/PF2Logo.webp" alt="Pathfinder" class="pf-main-logo">
+            <h1>Deck of Endless NPCs</h1>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por carta, rol, secreto o alineamiento..." oninput="applyFilters()">
+            </div>
+        </div>
+
+        <div id="resultsCounter" class="results-counter"></div>
+        
+        <main id="main-content">
+            <div id="loading">Cargando cartas del mazo de PNJ...</div>
+            <div class="grid" id="npcGrid"></div>
+        </main>
+
+        <footer>
+            Pathfinder 2e — Deck of Endless NPCs Compendio Remasterizado.
+        </footer>
+    </div>
+
+    <script>
+        // Enlace al CSV del mazo de NPCs
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/TU_ENLACE_CSV_AQUI/pub?output=csv";
+        
+        let allNpcs = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('pf_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+            }
+
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    allNpcs = results.data;
+                    document.getElementById('loading').style.display = 'none';
+                    renderNpcs(allNpcs);
+                },
+                error: function(err) {
+                    document.getElementById('loading').textContent = "Error al conectar con el Google Sheet de PNJs.";
+                    console.error(err);
+                }
+            });
+        });
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = allNpcs.filter(p => {
+                const cardNum = (p['Carta'] || p['Card'] || '').toLowerCase();
+                const role1 = (p['Rol 1'] || p['Role 1'] || '').toLowerCase();
+                const role2 = (p['Rol 2'] || p['Role 2'] || '').toLowerCase();
+                const secret = (p['Secreto'] || p['Secret'] || '').toLowerCase();
+
+                return cardNum.includes(query) || role1.includes(query) || role2.includes(query) || secret.includes(query);
+            });
+
+            renderNpcs(filtered);
+        }
+
+        function renderNpcs(npcs) {
+            const grid = document.getElementById('npcGrid');
+            const counter = document.getElementById('resultsCounter');
+            grid.innerHTML = '';
+
+            counter.textContent = `Mostrando ${npcs.length} carta/s`;
+
+            if (npcs.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic;">No se ha encontrado ninguna carta con los filtros seleccionados.</p>`;
+                return;
+            }
+
+            npcs.forEach(p => {
+                const cardNum = p['Carta'] || p['Card'] || 'Carta #?';
+                const role1 = p['Rol 1'] || p['Role 1'] || '-';
+                const role2 = p['Rol 2'] || p['Role 2'] || '-';
+                const secret = p['Secreto'] || p['Secret'] || 'Sin secreto registrado';
+                const alignment = p['Alineamiento'] || p['Alignment'] || 'Neutral';
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-title-es">${cardNum}</div>
+                    <div class="card-title-en">Alineamiento: ${alignment}</div>
+                    <div class="card-stats">
+                        <div class="stat-row"><span class="stat-label">Rol Principal:</span> <span class="tag-role">${role1}</span></div>
+                        <div class="stat-row"><span class="stat-label">Rol Secundario:</span> <span class="tag-role">${role2}</span></div>
+                        <div class="stat-row" style="flex-direction: column; gap: 2px; margin-top: 6px;">
+                            <span class="stat-label">Secreto / Gancho:</span> 
+                            <span style="font-size: 0.85rem; font-style: italic;">${secret}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('pf_theme', 'dark');
+                themeIcon.textContent = '☀️';
+            } else {
+                localStorage.setItem('pf_theme', 'light');
+                themeIcon.textContent = '🌙';
+            }
+        }
+    </script>
+</body>
+</html>
