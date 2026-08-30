@@ -65,7 +65,7 @@
         }
 
         .container {
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
@@ -75,9 +75,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px 15px;
+            padding: 15px;
             border-bottom: 2px solid var(--pf-gold);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             background: var(--header-bg);
             border-radius: 6px;
             text-align: center;
@@ -131,6 +131,42 @@
             color: #000;
         }
 
+        /* Navegación por pestañas */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background-color: var(--card-bg);
+            border: 2px solid var(--pf-gold);
+            color: var(--pf-dark);
+            padding: 8.8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px var(--shadow);
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background-color: var(--pf-gold);
+            color: #111;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Controles y Buscador */
         .controls {
             margin-bottom: 25px;
             display: flex;
@@ -157,11 +193,6 @@
             box-shadow: 0 2px 8px var(--shadow);
         }
 
-        .search-box input::placeholder {
-            color: var(--text-muted);
-            font-style: italic;
-        }
-
         .results-counter {
             font-size: 0.95rem;
             color: var(--text-muted);
@@ -178,9 +209,74 @@
             font-family: 'Cinzel', serif;
         }
 
+        /* Generador de PNJ Interactivo */
+        .generator-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            border: 2px solid var(--pf-gold);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .generator-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn-generate {
+            background-color: var(--pf-class);
+            color: #ffffff;
+            border: 1px solid var(--pf-gold);
+            padding: 12px 24px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 3px 8px var(--shadow);
+        }
+
+        .btn-generate:hover {
+            transform: scale(1.03);
+            background-color: #0d5432;
+        }
+
+        .npc-sheet {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-top: 1px solid var(--card-border);
+            padding-top: 20px;
+        }
+
+        .npc-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 15px;
+            align-items: baseline;
+            border-bottom: 1px dashed var(--card-border);
+            padding-bottom: 8px;
+        }
+
+        .npc-label {
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            color: var(--pf-gold);
+        }
+
+        .npc-value {
+            font-size: 1.05rem;
+        }
+
+        /* Rejilla del Compendio */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
             align-items: start;
         }
@@ -193,6 +289,9 @@
             box-shadow: 0 3px 8px var(--shadow);
             transition: transform 0.2s, box-shadow 0.2s;
             border-top: 4px solid var(--pf-gold);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .card:hover {
@@ -200,49 +299,60 @@
             box-shadow: 0 6px 16px var(--shadow);
         }
 
-        .card-title-es {
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--pf-dark);
-            margin-bottom: 2px;
-        }
-
-        .card-title-en {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-style: italic;
-            margin-bottom: 12px;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 6px;
-        }
-
-        .card-stats {
-            font-size: 0.9rem;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .stat-row {
+        .card-header-row {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
         }
 
-        .stat-label {
-            font-weight: 600;
+        .card-id {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
             color: var(--pf-gold);
-            white-space: nowrap;
         }
 
-        .tag-role {
+        .tag-trait {
             background-color: var(--tag-bg);
             color: var(--tag-text);
             padding: 2px 8px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .card-role {
+            font-family: 'Cinzel', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--pf-dark);
+        }
+
+        .section-box {
+            background-color: rgba(181, 141, 61, 0.08);
+            border-left: 3px solid var(--pf-gold);
+            padding: 8px 10px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.88rem;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: var(--pf-gold);
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .options-list {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 10px;
         }
 
         footer {
@@ -266,18 +376,45 @@
             <h1>Deck of Endless NPCs</h1>
         </header>
 
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar por carta, rol, secreto o alineamiento..." oninput="applyFilters()">
+        <!-- Pestañas de Navegación -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('generator')">🎲 Generador Interactivo</button>
+            <button class="tab-btn" onclick="switchTab('compendium')">📜 Compendio de Cartas</button>
+        </div>
+
+        <!-- PESTAÑA 1: GENERADOR INTERACTIVO -->
+        <div id="tab-generator" class="tab-content active">
+            <div class="generator-container">
+                <div class="generator-actions">
+                    <button class="btn-generate" onclick="generateNpc()">✨ Generar PNJ Aleatorio</button>
+                </div>
+                <div id="generatorLoading" style="text-align: center; font-style: italic; color: var(--pf-gold);">Cargando bases de datos para el generador...</div>
+                <div id="npcOutput" class="npc-sheet" style="display: none;">
+                    <div class="npc-row"><span class="npc-label">Nombre:</span> <span class="npc-value" id="genName">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Ancestría / Etnia:</span> <span class="npc-value" id="genAncestry">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Estado de Llegada:</span> <span class="npc-value" id="genArrival">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Círculo Social:</span> <span class="npc-value" id="genSocial">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Carta & Rasgo:</span> <span class="npc-value" id="genCardInfo">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Rol Principal:</span> <span class="npc-value" id="genRole">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Secreto:</span> <span class="npc-value" id="genSecret">-</span></div>
+                    <div class="npc-row"><span class="npc-label">Gancho:</span> <span class="npc-value" id="genHook">-</span></div>
+                </div>
             </div>
         </div>
 
-        <div id="resultsCounter" class="results-counter"></div>
-        
-        <main id="main-content">
-            <div id="loading">Cargando cartas del mazo de PNJ...</div>
-            <div class="grid" id="npcGrid"></div>
-        </main>
+        <!-- PESTAÑA 2: COMPENDIO DE CARTAS -->
+        <div id="tab-compendium" class="tab-content">
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar por ID, rasgo, rol, secreto o gancho..." oninput="applyFilters()">
+                </div>
+            </div>
+            <div id="resultsCounter" class="results-counter"></div>
+            <main id="main-content">
+                <div id="loading">Cargando compendio de cartas...</div>
+                <div class="grid" id="npcGrid"></div>
+            </main>
+        </div>
 
         <footer>
             Pathfinder 2e — Deck of Endless NPCs Compendio Remasterizado.
@@ -285,10 +422,12 @@
     </div>
 
     <script>
-        // Enlace al CSV del mazo de NPCs
-        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRA5fTf6J0mcS6xa7q31cGi5AH2hj614dNA_o5DBEWJ4apTt49Vq-szFdi6KDdiu70ZaA1yMHmXKzP3/pub?output=csv";
+        const CARDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRA5fTf6J0mcS6xa7q31cGi5AH2hj614dNA_o5DBEWJ4apTt49Vq-szFdi6KDdiu70ZaA1yMHmXKzP3/pub?gid=1499193207&single=true&output=csv";
+        const NAMES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRA5fTf6J0mcS6xa7q31cGi5AH2hj614dNA_o5DBEWJ4apTt49Vq-szFdi6KDdiu70ZaA1yMHmXKzP3/pub?gid=1068558792&single=true&output=csv";
         
         let allNpcs = [];
+        let allNamesData = [];
+        let dataLoaded = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('pf_theme');
@@ -297,37 +436,124 @@
                 document.getElementById('themeIcon').textContent = '☀️';
             }
 
-            Papa.parse(SHEET_CSV_URL, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    allNpcs = results.data;
-                    document.getElementById('loading').style.display = 'none';
-                    renderNpcs(allNpcs);
-                },
-                error: function(err) {
-                    document.getElementById('loading').textContent = "Error al conectar con el Google Sheet de PNJs.";
-                    console.error(err);
-                }
+            // Carga paralela de ambas bases de datos CSV
+            Promise.all([
+                new Promise(resolve => Papa.parse(CARDS_CSV_URL, { download: true, header: true, skipEmptyLines: true, complete: res => resolve(res.data) })),
+                new Promise(resolve => Papa.parse(NAMES_CSV_URL, { download: true, header: true, skipEmptyLines: true, complete: res => resolve(res.data) }))
+            ]).then(([cards, names]) => {
+                allNpcs = cards;
+                allNamesData = names;
+                dataLoaded = true;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('generatorLoading').style.display = 'none';
+                renderNpcs(allNpcs);
+                generateNpc(); // Generar uno inicial
+            }).catch(err => {
+                console.error("Error al cargar los datos:", err);
+                document.getElementById('loading').textContent = "Error al conectar con las hojas de cálculo.";
+                document.getElementById('generatorLoading').textContent = "Error al cargar los datos del generador.";
             });
         });
 
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabId === 'generator') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-generator').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-compendium').classList.add('active');
+            }
+        }
+
+        // Generador Interactivo de PNJ (Replica la lógica del generador de Excel)
+        function generateNpc() {
+            if (!dataLoaded || allNpcs.length === 0) return;
+
+            // 1. Seleccionar Carta Aleatoria
+            const randomCard = allNpcs[Math.floor(Math.random() * allNpcs.length)];
+            
+            // 2. Seleccionar Ancestría y Etnia aleatoria
+            let ancestryName = "Desconocida";
+            let chosenName = "Ciudadano Anónimo";
+            if (allNamesData.length > 0) {
+                const randomRow = allNamesData[Math.floor(Math.random() * allNamesData.length)];
+                // Extraer columnas disponibles de nombres o ancestría
+                const keys = Object.keys(randomRow);
+                ancestryName = randomRow[keys[0]] || randomRow['Ancestry'] || 'Humano';
+                
+                // Recopilar nombres válidos de la fila
+                let nameList = [];
+                keys.forEach(k => {
+                    if (k.toLowerCase() !== 'ancestry' && k.toLowerCase() !== 'ethnicity' && randomRow[k] && randomRow[k].trim() !== '') {
+                        nameList.push(randomRow[k].trim());
+                    }
+                });
+                if (nameList.length > 0) {
+                    chosenName = nameList[Math.floor(Math.random() * nameList.length)];
+                }
+            }
+
+            // 3. Tiradas aleatorias para Estado y Círculo Social (simulando tiradas de dados del manual)
+            const arrivalRoll = Math.floor(Math.random() * 7); // 0-6
+            let arrivalText = "Local Resident";
+            if (arrivalRoll >= 4 && arrivalRoll <= 5) arrivalText = "Frequent Visitor";
+            else if (arrivalRoll === 6) arrivalText = "Newly Arrived";
+
+            const socialRoll = Math.floor(Math.random() * 7); // 0-6
+            let socialText = "Alone";
+            if (socialRoll >= 1 && socialRoll <= 2) socialText = "A few friends";
+            else if (socialRoll >= 3) socialText = "Friends and Family";
+
+            // 4. Secretos y Ganchos
+            const cardId = randomCard['Card ID'] || 'CARD #?';
+            const trait = randomCard['Trait'] || 'Sin rasgo';
+            const role = randomCard['Role'] || 'Sin rol';
+            const secret = randomCard['Secret'] || 'Sin secreto registrado';
+            const sName = randomCard['S Name'] || 'Secreto';
+            const sCondition = randomCard['Secret Condition'] || '';
+            const hName = randomCard['Hook Name'] || 'Gancho';
+
+            // Tirada para sub-opciones S y H (0 a 6)
+            const sRoll = Math.floor(Math.random() * 7);
+            const hRoll = Math.floor(Math.random() * 7);
+            const sSubOpt = randomCard[`S${sRoll}`] ? ` [${sRoll}: ${randomCard[`S${sRoll}`]}]` : '';
+            const hSubOpt = randomCard[`H${hRoll}`] ? ` [${hRoll}: ${randomCard[`H${hRoll}`]}]` : '';
+
+            // Mostrar resultados en la interfaz
+            document.getElementById('genName').textContent = chosenName;
+            document.getElementById('genAncestry').textContent = ancestryName;
+            document.getElementById('genArrival').textContent = `${arrivalText} (Tirada: ${arrivalRoll})`;
+            document.getElementById('genSocial').textContent = `${socialText} (Tirada: ${socialRoll})`;
+            document.getElementById('genCardInfo').textContent = `${cardId} — Rasgo: ${trait}`;
+            document.getElementById('genRole').textContent = role;
+            document.getElementById('genSecret').textContent = `${sName}: ${secret} ${sCondition ? '⚡ ' + sCondition : ''} ${sSubOpt}`;
+            document.getElementById('genHook').textContent = `${hName}${hSubOpt}`;
+
+            document.getElementById('npcOutput').style.display = 'flex';
+        }
+
+        // Filtros del Compendio
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
 
             const filtered = allNpcs.filter(p => {
-                const cardNum = (p['Carta'] || p['Card'] || '').toLowerCase();
-                const role1 = (p['Rol 1'] || p['Role 1'] || '').toLowerCase();
-                const role2 = (p['Rol 2'] || p['Role 2'] || '').toLowerCase();
-                const secret = (p['Secreto'] || p['Secret'] || '').toLowerCase();
+                const cardId = (p['Card ID'] || '').toLowerCase();
+                const trait = (p['Trait'] || '').toLowerCase();
+                const role = (p['Role'] || '').toLowerCase();
+                const secret = (p['Secret'] || '').toLowerCase();
+                const hookName = (p['Hook Name'] || '').toLowerCase();
 
-                return cardNum.includes(query) || role1.includes(query) || role2.includes(query) || secret.includes(query);
+                return cardId.includes(query) || trait.includes(query) || role.includes(query) || secret.includes(query) || hookName.includes(query);
             });
 
             renderNpcs(filtered);
         }
 
+        // Renderizado del Compendio de Cartas
         function renderNpcs(npcs) {
             const grid = document.getElementById('npcGrid');
             const counter = document.getElementById('resultsCounter');
@@ -341,30 +567,55 @@
             }
 
             npcs.forEach(p => {
-                const cardNum = p['Carta'] || p['Card'] || 'Carta #?';
-                const role1 = p['Rol 1'] || p['Role 1'] || '-';
-                const role2 = p['Rol 2'] || p['Role 2'] || '-';
-                const secret = p['Secreto'] || p['Secret'] || 'Sin secreto registrado';
-                const alignment = p['Alineamiento'] || p['Alignment'] || 'Neutral';
+                const cardId = p['Card ID'] || 'CARD #?';
+                const trait = p['Trait'] || 'Sin rasgo';
+                const role = p['Role'] || 'Sin rol';
+                const sName = p['S Name'] || 'Secreto / Rasgo S';
+                const secret = p['Secret'] || 'Sin secreto registrado';
+                const sCondition = p['Secret Condition'] || '';
+                const hName = p['Hook Name'] || 'Gancho H';
+
+                let sOptionsHtml = '';
+                ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'].forEach((col, idx) => {
+                    if (p[col] && p[col].trim() !== '') {
+                        sOptionsHtml += `<div><b>${idx}:</b> ${p[col]}</div>`;
+                    }
+                });
+
+                let hOptionsHtml = '';
+                ['H0', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].forEach((col, idx) => {
+                    if (p[col] && p[col].trim() !== '') {
+                        hOptionsHtml += `<div><b>${idx}:</b> ${p[col]}</div>`;
+                    }
+                });
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-title-es">${cardNum}</div>
-                    <div class="card-title-en">Alineamiento: ${alignment}</div>
-                    <div class="card-stats">
-                        <div class="stat-row"><span class="stat-label">Rol Principal:</span> <span class="tag-role">${role1}</span></div>
-                        <div class="stat-row"><span class="stat-label">Rol Secundario:</span> <span class="tag-role">${role2}</span></div>
-                        <div class="stat-row" style="flex-direction: column; gap: 2px; margin-top: 6px;">
-                            <span class="stat-label">Secreto / Gancho:</span> 
-                            <span style="font-size: 0.85rem; font-style: italic;">${secret}</span>
-                        </div>
+                    <div class="card-header-row">
+                        <span class="card-id">${cardId}</span>
+                        <span class="tag-trait">${trait}</span>
                     </div>
+                    <div class="card-role">${role}</div>
+                    
+                    <div class="section-box">
+                        <span class="section-title">🔒 Secreto: ${sName}</span>
+                        <div style="font-style: italic; margin-bottom: 4px;">${secret}</div>
+                        ${sCondition ? `<div style="font-size: 0.8rem; color: var(--pf-burgundy); font-weight: bold;">⚡ ${sCondition}</div>` : ''}
+                        ${sOptionsHtml ? `<div class="options-list">${sOptionsHtml}</div>` : ''}
+                    </div>
+
+                    ${hName !== 'Hook H' && hName !== '' ? `
+                    <div class="section-box">
+                        <span class="section-title">🎣 Gancho: ${hName}</span>
+                        ${hOptionsHtml ? `<div class="options-list">${hOptionsHtml}</div>` : ''}
+                    </div>` : ''}
                 `;
                 grid.appendChild(card);
             });
         }
 
+        // Cambio de Tema
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('themeIcon');
