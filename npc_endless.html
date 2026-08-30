@@ -10,9 +10,6 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Roboto+Condensed:wght@700&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <!-- PapaParse para leer datos CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <style>
         :root {
@@ -131,7 +128,6 @@
             color: #000;
         }
 
-        /* Navegación por pestañas */
         .nav-tabs {
             display: flex;
             justify-content: center;
@@ -166,7 +162,6 @@
             display: block;
         }
 
-        /* Controles y Buscador */
         .controls {
             margin-bottom: 25px;
             display: flex;
@@ -201,15 +196,6 @@
             text-align: center;
         }
 
-        #loading {
-            text-align: center;
-            font-size: 1.2rem;
-            color: var(--pf-gold);
-            padding: 40px;
-            font-family: 'Cinzel', serif;
-        }
-
-        /* Generador de PNJ Interactivo */
         .generator-container {
             max-width: 800px;
             margin: 0 auto;
@@ -273,7 +259,6 @@
             font-size: 1.05rem;
         }
 
-        /* Rejilla del Compendio */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -376,20 +361,18 @@
             <h1>Deck of Endless NPCs</h1>
         </header>
 
-        <!-- Pestañas de Navegación -->
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('generator')">🎲 Generador Interactivo</button>
             <button class="tab-btn" onclick="switchTab('compendium')">📜 Compendio de Cartas</button>
         </div>
 
-        <!-- PESTAÑA 1: GENERADOR INTERACTIVO -->
+        <!-- GENERADOR INTERACTIVO -->
         <div id="tab-generator" class="tab-content active">
             <div class="generator-container">
                 <div class="generator-actions">
                     <button class="btn-generate" onclick="generateNpc()">✨ Generar PNJ Aleatorio</button>
                 </div>
-                <div id="generatorLoading" style="text-align: center; font-style: italic; color: var(--pf-gold);">Cargando bases de datos para el generador...</div>
-                <div id="npcOutput" class="npc-sheet" style="display: none;">
+                <div id="npcOutput" class="npc-sheet">
                     <div class="npc-row"><span class="npc-label">Nombre:</span> <span class="npc-value" id="genName">-</span></div>
                     <div class="npc-row"><span class="npc-label">Ancestría / Etnia:</span> <span class="npc-value" id="genAncestry">-</span></div>
                     <div class="npc-row"><span class="npc-label">Estado de Llegada:</span> <span class="npc-value" id="genArrival">-</span></div>
@@ -402,7 +385,7 @@
             </div>
         </div>
 
-        <!-- PESTAÑA 2: COMPENDIO DE CARTAS -->
+        <!-- COMPENDIO DE CARTAS -->
         <div id="tab-compendium" class="tab-content">
             <div class="controls">
                 <div class="search-box">
@@ -411,7 +394,6 @@
             </div>
             <div id="resultsCounter" class="results-counter"></div>
             <main id="main-content">
-                <div id="loading">Cargando compendio de cartas...</div>
                 <div class="grid" id="npcGrid"></div>
             </main>
         </div>
@@ -422,12 +404,72 @@
     </div>
 
     <script>
-        const CARDS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRA5fTf6J0mcS6xa7q31cGi5AH2hj614dNA_o5DBEWJ4apTt49Vq-szFdi6KDdiu70ZaA1yMHmXKzP3/pub?gid=1499193207&single=true&output=csv";
-        const NAMES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRA5fTf6J0mcS6xa7q31cGi5AH2hj614dNA_o5DBEWJ4apTt49Vq-szFdi6KDdiu70ZaA1yMHmXKzP3/pub?gid=1068558792&single=true&output=csv";
-        
-        let allNpcs = [];
-        let allNamesData = [];
-        let dataLoaded = false;
+        // Base de datos de cartas integrada localmente
+        const allNpcs = [
+            {
+                "Card ID": "CARD #36",
+                "Trait": "DANCER",
+                "Role": "GREGARIOUS",
+                "S Name": "Venue",
+                "S0": "Private patron", "S1": "Private patron", "S2": "Street corner", "S3": "Local tavern", "S4": "Theater", "S5": "Theater", "S6": "The court",
+                "Secret": "In truth, this NPC is serving as a distraction while a crime is being",
+                "Secret Condition": "If H is 1, apply the secret.",
+                "Hook Name": "Distraction",
+                "H0": "Someone else's clothes", "H1": "Pesky stain", "H2": "Dropped sock", "H3": "Fallen basket", "H4": "Stolen item", "H5": "Stolen item", "H6": "Stolen item"
+            },
+            {
+                "Card ID": "CARD #42",
+                "Trait": "JUGGLER",
+                "Role": "OUT OF CONTROL",
+                "S Name": "Object",
+                "S0": "Alc. Bombs", "S1": "Torches", "S2": "Rings", "S3": "Balls", "S4": "Clubs", "S5": "Knives", "S6": "Knives",
+                "Secret": "Someone has poisoned this NPC and it is only a matter of time before they collapse or hurt themselves.",
+                "Secret Condition": "If H is 0, apply the secret.",
+                "Hook Name": "What is it?",
+                "H0": "Dull weapon", "H1": "Dented armor", "H2": "Torn clothes", "H3": "Broken tool", "H4": "Small toy", "H5": "Magic item", "H6": "Magic item"
+            },
+            {
+                "Card ID": "CARD #47",
+                "Trait": "BARBER",
+                "Role": "CONFUSED",
+                "S Name": "Specialty",
+                "S0": "Surgery", "S1": "Treat poison", "S2": "Stitch wounds", "S3": "Cuts/shaves", "S4": "Pull teeth", "S5": "Treat disease", "S6": "Treat disease",
+                "Secret": "This character is visiting from a far away place, using magic to speak and read the local language. Unfortunately, that magic has failed and they cannot...",
+                "Secret Condition": "If S is 3, apply the secret.",
+                "Hook Name": "Cleaning Up",
+                "H0": "Tidy area", "H1": "Tidy area", "H2": "Tidy area", "H3": "Tidy area", "H4": "Tidy area", "H5": "Tidy area", "H6": "Tidy area"
+            },
+            {
+                "Card ID": "CARD #65",
+                "Trait": "EXPLORER",
+                "Role": "UNRELIABLE",
+                "S Name": "Goal",
+                "S0": "Travel planes", "S1": "Summit peaks", "S2": "Catalog beasts", "S3": "See the world", "S4": "Chart unknown", "S5": "Explore ruins", "S6": "Explore ruins",
+                "Secret": "This character is living a double life, with two families, two jobs, and two sets of friends. They are just barely...",
+                "Secret Condition": "If S is 2, apply the secret.",
+                "Hook Name": "Mending",
+                "H0": "Dull weapon", "H1": "Dented armor", "H2": "Torn clothes", "H3": "Broken tool", "H4": "Small toy", "H5": "Magic item", "H6": "Magic item"
+            },
+            {
+                "Card ID": "CARD #93",
+                "Trait": "LUMBERJACK",
+                "Role": "MISCREANT",
+                "S Name": "Job",
+                "S0": "Steal from PCs", "S1": "Plant evidence", "S2": "Fence goods", "S3": "Burglary", "S4": "Make a contact", "S5": "Recruit member", "S6": "Recruit member",
+                "Secret": "This NPC desperately wants to become a bard, focusing on comedy and pranks, maybe even hoping to one day become a royal jester, but there’s just one problem. They’re not very funny.",
+                "Secret Condition": "",
+                "Hook Name": "Laundry Day",
+                "H0": "Someone else’s clothes", "H1": "Pesky stain", "H2": "Dropped sock", "H3": "Fallen basket", "H4": "Stolen item", "H5": "Stolen item", "H6": "Stolen item"
+            }
+        ];
+
+        // Base de datos de nombres y ancestrías integrada localmente
+        const allNamesData = [
+            { "Ancestry": "Human (Taldan)", "Names": "Asennal, Rochaide, Aysobel, Shonara, Brinna, Thertet, Elklynn, Thunvial, Jaimelle, Vivici, Orlalessa, Wendl" },
+            { "Ancestry": "Human (General)", "Names": "Milgria, Vanna, Muscan, Wilendithas, Bado, Kirkired, Cardanta, Kunda, Dondrina, Lirma, Gredda, Nomera, Guon, Sol, Ikko, Stalla" },
+            { "Ancestry": "Dwarf / General", "Names": "Dezoc, Nemdal, Feg, Omgot, Frudhiffs, Scrud, Klug, Soot, Leb, Thorg, Manter, Wendle" },
+            { "Ancestry": "Kobold", "Names": "Azmak, Parvan, Derukal, Skirsos, Jekkajak, Urkak, Kirrok, Vroklan, Kriktos, Yaggest, Mirkol, Zgaz" }
+        ];
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('pf_theme');
@@ -436,24 +478,8 @@
                 document.getElementById('themeIcon').textContent = '☀️';
             }
 
-            // Carga paralela de ambas bases de datos CSV
-            Promise.all([
-                new Promise(resolve => Papa.parse(CARDS_CSV_URL, { download: true, header: true, skipEmptyLines: true, complete: res => resolve(res.data) })),
-                new Promise(resolve => Papa.parse(NAMES_CSV_URL, { download: true, header: true, skipEmptyLines: true, complete: res => resolve(res.data) }))
-            ]).then(([cards, names]) => {
-                allNpcs = cards;
-                allNamesData = names;
-                dataLoaded = true;
-
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('generatorLoading').style.display = 'none';
-                renderNpcs(allNpcs);
-                generateNpc(); // Generar uno inicial
-            }).catch(err => {
-                console.error("Error al cargar los datos:", err);
-                document.getElementById('loading').textContent = "Error al conectar con las hojas de cálculo.";
-                document.getElementById('generatorLoading').textContent = "Error al cargar los datos del generador.";
-            });
+            renderNpcs(allNpcs);
+            generateNpc();
         });
 
         function switchTab(tabId) {
@@ -469,61 +495,39 @@
             }
         }
 
-        // Generador Interactivo de PNJ (Replica la lógica del generador de Excel)
         function generateNpc() {
-            if (!dataLoaded || allNpcs.length === 0) return;
+            if (allNpcs.length === 0) return;
 
-            // 1. Seleccionar Carta Aleatoria
             const randomCard = allNpcs[Math.floor(Math.random() * allNpcs.length)];
             
-            // 2. Seleccionar Ancestría y Etnia aleatoria
-            let ancestryName = "Desconocida";
-            let chosenName = "Ciudadano Anónimo";
-            if (allNamesData.length > 0) {
-                const randomRow = allNamesData[Math.floor(Math.random() * allNamesData.length)];
-                // Extraer columnas disponibles de nombres o ancestría
-                const keys = Object.keys(randomRow);
-                ancestryName = randomRow[keys[0]] || randomRow['Ancestry'] || 'Humano';
-                
-                // Recopilar nombres válidos de la fila
-                let nameList = [];
-                keys.forEach(k => {
-                    if (k.toLowerCase() !== 'ancestry' && k.toLowerCase() !== 'ethnicity' && randomRow[k] && randomRow[k].trim() !== '') {
-                        nameList.push(randomRow[k].trim());
-                    }
-                });
-                if (nameList.length > 0) {
-                    chosenName = nameList[Math.floor(Math.random() * nameList.length)];
-                }
-            }
+            const randomRow = allNamesData[Math.floor(Math.random() * allNamesData.length)];
+            const ancestryName = randomRow['Ancestry'];
+            const nameList = randomRow['Names'].split(', ');
+            const chosenName = nameList[Math.floor(Math.random() * nameList.length)];
 
-            // 3. Tiradas aleatorias para Estado y Círculo Social (simulando tiradas de dados del manual)
-            const arrivalRoll = Math.floor(Math.random() * 7); // 0-6
+            const arrivalRoll = Math.floor(Math.random() * 7);
             let arrivalText = "Local Resident";
             if (arrivalRoll >= 4 && arrivalRoll <= 5) arrivalText = "Frequent Visitor";
             else if (arrivalRoll === 6) arrivalText = "Newly Arrived";
 
-            const socialRoll = Math.floor(Math.random() * 7); // 0-6
+            const socialRoll = Math.floor(Math.random() * 7);
             let socialText = "Alone";
             if (socialRoll >= 1 && socialRoll <= 2) socialText = "A few friends";
             else if (socialRoll >= 3) socialText = "Friends and Family";
 
-            // 4. Secretos y Ganchos
-            const cardId = randomCard['Card ID'] || 'CARD #?';
-            const trait = randomCard['Trait'] || 'Sin rasgo';
-            const role = randomCard['Role'] || 'Sin rol';
-            const secret = randomCard['Secret'] || 'Sin secreto registrado';
-            const sName = randomCard['S Name'] || 'Secreto';
-            const sCondition = randomCard['Secret Condition'] || '';
-            const hName = randomCard['Hook Name'] || 'Gancho';
+            const cardId = randomCard['Card ID'];
+            const trait = randomCard['Trait'];
+            const role = randomCard['Role'];
+            const secret = randomCard['Secret'];
+            const sName = randomCard['S Name'];
+            const sCondition = randomCard['Secret Condition'];
+            const hName = randomCard['Hook Name'];
 
-            // Tirada para sub-opciones S y H (0 a 6)
             const sRoll = Math.floor(Math.random() * 7);
             const hRoll = Math.floor(Math.random() * 7);
             const sSubOpt = randomCard[`S${sRoll}`] ? ` [${sRoll}: ${randomCard[`S${sRoll}`]}]` : '';
             const hSubOpt = randomCard[`H${hRoll}`] ? ` [${hRoll}: ${randomCard[`H${hRoll}`]}]` : '';
 
-            // Mostrar resultados en la interfaz
             document.getElementById('genName').textContent = chosenName;
             document.getElementById('genAncestry').textContent = ancestryName;
             document.getElementById('genArrival').textContent = `${arrivalText} (Tirada: ${arrivalRoll})`;
@@ -532,11 +536,8 @@
             document.getElementById('genRole').textContent = role;
             document.getElementById('genSecret').textContent = `${sName}: ${secret} ${sCondition ? '⚡ ' + sCondition : ''} ${sSubOpt}`;
             document.getElementById('genHook').textContent = `${hName}${hSubOpt}`;
-
-            document.getElementById('npcOutput').style.display = 'flex';
         }
 
-        // Filtros del Compendio
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
 
@@ -553,13 +554,12 @@
             renderNpcs(filtered);
         }
 
-        // Renderizado del Compendio de Cartas
         function renderNpcs(npcs) {
             const grid = document.getElementById('npcGrid');
             const counter = document.getElementById('resultsCounter');
             grid.innerHTML = '';
 
-            counter.textContent = `Mostrando ${npcs.length} carta/s`;
+            if (counter) counter.textContent = `Mostrando ${npcs.length} carta/s`;
 
             if (npcs.length === 0) {
                 grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; font-style: italic;">No se ha encontrado ninguna carta con los filtros seleccionados.</p>`;
@@ -567,24 +567,24 @@
             }
 
             npcs.forEach(p => {
-                const cardId = p['Card ID'] || 'CARD #?';
-                const trait = p['Trait'] || 'Sin rasgo';
-                const role = p['Role'] || 'Sin rol';
-                const sName = p['S Name'] || 'Secreto / Rasgo S';
-                const secret = p['Secret'] || 'Sin secreto registrado';
-                const sCondition = p['Secret Condition'] || '';
-                const hName = p['Hook Name'] || 'Gancho H';
+                const cardId = p['Card ID'];
+                const trait = p['Trait'];
+                const role = p['Role'];
+                const sName = p['S Name'];
+                const secret = p['Secret'];
+                const sCondition = p['Secret Condition'];
+                const hName = p['Hook Name'];
 
                 let sOptionsHtml = '';
                 ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6'].forEach((col, idx) => {
-                    if (p[col] && p[col].trim() !== '') {
+                    if (p[col]) {
                         sOptionsHtml += `<div><b>${idx}:</b> ${p[col]}</div>`;
                     }
                 });
 
                 let hOptionsHtml = '';
                 ['H0', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].forEach((col, idx) => {
-                    if (p[col] && p[col].trim() !== '') {
+                    if (p[col]) {
                         hOptionsHtml += `<div><b>${idx}:</b> ${p[col]}</div>`;
                     }
                 });
@@ -605,7 +605,7 @@
                         ${sOptionsHtml ? `<div class="options-list">${sOptionsHtml}</div>` : ''}
                     </div>
 
-                    ${hName !== 'Hook H' && hName !== '' ? `
+                    ${hName ? `
                     <div class="section-box">
                         <span class="section-title">🎣 Gancho: ${hName}</span>
                         ${hOptionsHtml ? `<div class="options-list">${hOptionsHtml}</div>` : ''}
@@ -615,7 +615,6 @@
             });
         }
 
-        // Cambio de Tema
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('themeIcon');
