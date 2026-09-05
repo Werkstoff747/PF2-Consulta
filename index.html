@@ -6,6 +6,8 @@
     <title>Pathfinder 2e Remaster — Hub de Ayudas</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./icons/Pfav.png">
+    <!-- Librería PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Fuentes estilo Pathfinder / Paizo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,10 +179,15 @@
             color: var(--pf-dark);
         }
 
-        .hub-card:hover {
+        .hub-card.active:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             border-color: var(--pf-gold);
+        }
+
+        .hub-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .hub-card-header {
@@ -218,7 +225,7 @@
             white-space: nowrap;
         }
 
-        .hub-badge.disabled {
+        .hub-badge.badge-disabled {
             background-color: var(--card-border);
             color: var(--text-muted);
             border-color: transparent;
@@ -243,6 +250,22 @@
         }
 
         body.dark-mode .hub-card-action {
+            color: var(--pf-gold);
+        }
+
+        .hub-card-action.disabled-action {
+            color: var(--text-muted) !important;
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--pf-class);
+            padding: 40px;
+            font-family: 'Cinzel', serif;
+        }
+
+        body.dark-mode #loading {
             color: var(--pf-gold);
         }
 
@@ -320,50 +343,16 @@
         </button>
     </header>
 
-    <div class="welcome-panel">
-        <h2>Bienvenido al Archivo Arcana</h2>
-        <p>Selecciona una de las herramientas de consulta rápida para consultar reglas, hechizos o utilidades maquetadas según el reglamento oficial de <strong>Pathfinder 2ª Edición Remaster</strong>.</p>
+    <!-- MENSAJE DE BIENVENIDA DINÁMICO DESDE GOOGLE SHEETS -->
+    <div class="welcome-panel" id="welcomePanel" style="display: none;">
+        <h2 id="welcomeTitle"></h2>
+        <p id="welcomeDesc"></p>
     </div>
 
-    <div class="hub-grid">
-        
-        <!-- TARJETA 1: COMPENDIO MÁGICO -->
-        <a href="compendio.html" class="hub-card">
-            <div>
-                <div class="hub-card-header">
-                    <span class="hub-card-title">📜 Compendio Mágico</span>
-                    <span class="hub-badge">Herramienta</span>
-                </div>
-                <p class="hub-card-desc">Buscador y filtro completo de conjuros, trucos, hechizos de foco y rituales. Clasificados por tradición, rango y clases con sus reglas de potenciación.</p>
-            </div>
-            <span class="hub-card-action">Acceder al Compendio ➔</span>
-        </a>
+    <div id="loading">Consultando el archivo arcano de Google Sheets...</div>
 
-        <!-- TARJETA 2: REFERENCIA RÁPIDA (EJEMPLO PRÓXIMA) -->
-        <div class="hub-card" style="opacity: 0.6; cursor: not-allowed;">
-            <div>
-                <div class="hub-card-header">
-                    <span class="hub-card-title">⚔️ Acciones y Reglas</span>
-                    <span class="hub-badge disabled">Próximamente</span>
-                </div>
-                <p class="hub-card-desc">Acciones básicas de combate, habilidades entrenadas, maniobras de atletismo y glosario rápido de estados y condiciones.</p>
-            </div>
-            <span class="hub-card-action" style="color: var(--text-muted);">En desarrollo...</span>
-        </div>
-
-        <!-- TARJETA 3: GESTOR DE ENCUENTROS (EJEMPLO PRÓXIMA) -->
-        <div class="hub-card" style="opacity: 0.6; cursor: not-allowed;">
-            <div>
-                <div class="hub-card-header">
-                    <span class="hub-card-title">🎲 Ayudas del DJ</span>
-                    <span class="hub-badge disabled">Próximamente</span>
-                </div>
-                <p class="hub-card-desc">Tablas de CDs por nivel, reglas de exploración, tiempo libre (Downtime) y cálculo del presupuesto de experiencia para encuentros.</p>
-            </div>
-            <span class="hub-card-action" style="color: var(--text-muted);">En desarrollo...</span>
-        </div>
-
-    </div>
+    <!-- REJILLA DE TARJETAS DINÁMICA -->
+    <div class="hub-grid" id="hubGrid"></div>
 
     <footer>
         <p><strong>Compendio Mágico de Golarion — Maquetado Remasterizado.</strong></p>
@@ -404,11 +393,20 @@
 </div>
 
 <script>
+    const CSV_HUB_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS_aXJFG6k_46b0eYgkukMXGty7p06fPRXFC-Oj4kEAhqVs5GtXOgBYRUaRU9hyvg5cuw-w9cCo0QoX/pub?output=csv';
+
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
         document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
         localStorage.setItem('pf2e_theme', isDark ? 'dark' : 'light');
+    }
+
+    function getVal(row, keyName) {
+        if (!row) return '';
+        const keys = Object.keys(row);
+        const match = keys.find(k => k.trim().toLowerCase() === keyName.trim().toLowerCase());
+        return match && row[match] !== undefined && row[match] !== null ? row[match].toString().trim() : '';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -418,6 +416,21 @@
             document.body.classList.add('dark-mode');
             document.getElementById('themeIcon').textContent = '☀️';
         }
+
+        // Cargar datos desde Google Sheets
+        Papa.parse(CSV_HUB_URL, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                document.getElementById('loading').style.display = 'none';
+                renderHub(results.data);
+            },
+            error: function(err) {
+                console.error("Error al leer el CSV del Hub:", err);
+                document.getElementById('loading').innerText = "Error al cargar los datos de la portada.";
+            }
+        });
 
         // Eventos de la Botonera Flotante
         const scrollTopBtn = document.getElementById('scrollTopBtn');
@@ -441,6 +454,68 @@
             }
         });
     });
+
+    function renderHub(rows) {
+        const hubGrid = document.getElementById('hubGrid');
+        hubGrid.innerHTML = '';
+
+        rows.forEach(row => {
+            const tipo = getVal(row, 'TIPO').toLowerCase();
+            const titulo = getVal(row, 'TITULO');
+            const tag = getVal(row, 'TAG') || getVal(row, 'subtitulo_o_badge');
+            const descripcion = getVal(row, 'DESCRIPCION');
+            const url = getVal(row, 'URL');
+            const icono = getVal(row, 'ICONO');
+            const estado = getVal(row, 'ESTADO').toLowerCase();
+
+            // 1. Fila de Bienvenida (cuadro superior)
+            if (tipo === 'bienvenida') {
+                const welcomePanel = document.getElementById('welcomePanel');
+                document.getElementById('welcomeTitle').innerText = titulo;
+                document.getElementById('welcomeDesc').innerText = descripcion;
+                welcomePanel.style.display = 'block';
+                return;
+            }
+
+            // 2. Filas de Tarjetas (si TIPO está vacío o dice 'tarjeta')
+            if (tipo === 'tarjeta' || tipo === '') {
+                const isActiva = estado === 'activo' || estado === 'herramienta' || estado === '';
+
+                if (isActiva) {
+                    const card = document.createElement('a');
+                    card.className = 'hub-card active';
+                    card.href = url || '#';
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="hub-card-header">
+                                <span class="hub-card-title">${icono ? icono + ' ' : ''}${titulo}</span>
+                                <span class="hub-badge">${tag || 'Herramienta'}</span>
+                            </div>
+                            <p class="hub-card-desc">${descripcion}</p>
+                        </div>
+                        <span class="hub-card-action">Acceder ➔</span>
+                    `;
+                    hubGrid.appendChild(card);
+                } else {
+                    const card = document.createElement('div');
+                    card.className = 'hub-card disabled';
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="hub-card-header">
+                                <span class="hub-card-title">${icono ? icono + ' ' : ''}${titulo}</span>
+                                <span class="hub-badge badge-disabled">${tag || 'Próximamente'}</span>
+                            </div>
+                            <p class="hub-card-desc">${descripcion}</p>
+                        </div>
+                        <span class="hub-card-action disabled-action">En desarrollo...</span>
+                    `;
+                    hubGrid.appendChild(card);
+                }
+            }
+        });
+    }
 </script>
 
 </body>
