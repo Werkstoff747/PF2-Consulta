@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compendio Mágico de Golarion — PF2e Remaster</title>
-    <!-- Tu Favicon aquí -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="./icons/Pfav.png">
     <!-- Librería PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -27,6 +27,8 @@
             --text-muted: #555555;
             --line-color: #222222;
             --header-bg: #063d23;
+            --accent-red: #e53e3e;
+            --accent-crimson: #9b2c2c;
         }
 
         /* MODO NOCHE / OSCURO */
@@ -74,7 +76,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4px 15px;         /* Minimiza el fondo verde arriba y abajo */
+            padding: 4px 15px;
             border-bottom: 2px solid var(--pf-gold);
             margin-bottom: 20px;
             background: var(--header-bg);
@@ -84,11 +86,11 @@
         }
 
         .pf-main-logo {
-            max-width: 420px;          /* Reducimos el tamaño máximo del logo */
-            width: 80%;                /* Ocupa un porcentaje menor para hacerlo más compacto */
+            max-width: 420px;
+            width: 80%;
             height: auto;
             display: block;
-            margin: 0 auto -30px auto; /* Margen negativo para mantener el título pegado */
+            margin: 0 auto -30px auto;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
         }
 
@@ -119,7 +121,7 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3.2rem;         /* Letras grandes en versalitas */
+            font-size: 3.2rem;
             font-variant: small-caps;
             color: #ffffff !important;
             letter-spacing: 2px;
@@ -465,27 +467,49 @@
             color: var(--pf-gold);
         }
 
-        .scroll-top-btn {
+        /* BOTONES FLOTANTES INFERIORES */
+        .floating-btn-container {
             position: fixed;
             bottom: 25px;
             right: 25px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: #063d23;
-            color: #ffffff;
-            border: 1px solid var(--pf-gold);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             z-index: 100;
         }
 
-        .scroll-top-btn:hover {
+        .floating-action-btn, .scroll-top-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--pf-class);
+            color: #fff;
+            border: 1px solid var(--pf-gold);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .scroll-top-btn {
+            display: none; /* Oculto por defecto hasta hacer scroll */
+        }
+
+        .floating-action-btn:hover, .scroll-top-btn:hover {
             transform: translateY(-3px);
+            background-color: var(--pf-gold);
+            color: #000;
+        }
+
+        /* Ocultar los botones automáticamente al imprimir */
+        @media print {
+            .floating-btn-container {
+                display: none !important;
+            }
         }
 
         @media (max-width: 768px) {
@@ -568,20 +592,42 @@
     <div id="disciplinesWrapper"></div>
 
     <footer>
-            <p><strong>Compendio Mágico de Golarion — Maquetado Remasterizado.</strong></p>
-            <p style="font-size: 0.75rem; margin-top: 8px; opacity: 0.8; line-height: 1.4;">
-                Esta aplicación es una herramienta de consulta no oficial para jugadores y Directores de Juego, creada sin ánimo de lucro bajo la 
-                <strong>Política de Uso Comunitario de Paizo</strong> (<em>Paizo Community Use Policy</em>). 
-                Se nos prohíbe expresamente cobrarte por usar o acceder a este contenido. Este sitio web no está publicado, respaldado ni aprobado específicamente por Paizo.
-                <br>
-                <em>Pathfinder</em>, el logotipo de <em>Pathfinder</em>, el escenario de <em>Golarion</em> y sus elementos relacionados son marcas registradas de Paizo Inc. 
-                El material original pertenece a Paizo Inc. y sus traducciones oficiales a Devir Iberia. 
-                Para más información sobre la política comunitaria y los productos oficiales, visita <a href="https://paizo.com" target="_blank" style="color: inherit; text-decoration: underline;">paizo.com</a>.
-            </p>
-        </footer>
+        <p><strong>Compendio Mágico de Golarion — Maquetado Remasterizado.</strong></p>
+        <p style="font-size: 0.75rem; margin-top: 8px; opacity: 0.8; line-height: 1.4;">
+            Esta aplicación es una herramienta de consulta no oficial para jugadores y Directores de Juego, creada sin ánimo de lucro bajo la 
+            <strong>Política de Uso Comunitario de Paizo</strong> (<em>Paizo Community Use Policy</em>). 
+            Se nos prohíbe expresamente cobrarte por usar o acceder a este contenido. Este sitio web no está publicado, respaldado ni aprobado específicamente por Paizo.
+            <br>
+            <em>Pathfinder</em>, el logotipo de <em>Pathfinder</em>, el escenario de <em>Golarion</em> y sus elementos relacionados son marcas registradas de Paizo Inc. 
+            El material original pertenece a Paizo Inc. y sus traducciones oficiales a Devir Iberia. 
+            Para más información sobre la política comunitaria y los productos oficiales, visita <a href="https://paizo.com" target="_blank" style="color: inherit; text-decoration: underline;">paizo.com</a>.
+        </p>
+    </footer>
 </div>
 
-<button id="scrollTopBtn" class="scroll-top-btn" onclick="scrollToTop()" title="Volver arriba">▲</button>
+<!-- BOTONES FLOTANTES INFERIORES -->
+<div class="floating-btn-container">
+    <!-- Volver al Inicio (Index/Hub) -->
+    <a href="index.html" class="floating-action-btn" title="Volver al Inicio (Hub)" aria-label="Volver al Inicio">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+    </a>
+
+    <!-- Volver atrás -->
+    <button type="button" id="backBtn" class="floating-action-btn" title="Volver atrás" aria-label="Volver atrás">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+    </button>
+
+    <!-- Subir arriba -->
+    <button type="button" id="scrollTopBtn" class="scroll-top-btn" title="Subir arriba" aria-label="Subir arriba">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+        </svg>
+    </button>
+</div>
 
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTUNx-Tg6uDcxwffpf7XeKjlHJLhBm8i24Oq1ypRfX9j6JuEZnPGC3HbibEWWiQyNk2KVEJlG-HgtZU/pub?output=csv';
@@ -650,10 +696,8 @@
         const imgReaction = '<img src="./icons/reaction.png" class="pf-action-img" alt="Reacción">';
         const imgFree     = '<img src="./icons/free_action.png" class="pf-action-img" alt="Acción Libre">';
     
-        // Limpieza de restos anteriores por si acaso
         resultado = resultado.replace(/<img[^>]*>/gi, '');
     
-        // Reemplaza los corchetes únicamente por la imagen limpia (sin repetir el texto)
         resultado = resultado.replace(/\[1\]/g, imgSingle);
         resultado = resultado.replace(/\[2\]/g, imgTwo);
         resultado = resultado.replace(/\[3\]/g, imgThree);
@@ -662,6 +706,7 @@
     
         return resultado;
     }
+
     function toggleCardExpand(btn) {
         const expandedContent = btn.nextElementSibling;
         const isHidden = window.getComputedStyle(expandedContent).display === 'none';
@@ -702,9 +747,26 @@
             }
         });
 
+        // Configuración de eventos de la Botonera Flotante
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        const backBtn = document.getElementById('backBtn');
+
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                window.history.back();
+            });
+        }
+
+        if (scrollTopBtn) {
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
         window.addEventListener('scroll', () => {
-            const btn = document.getElementById('scrollTopBtn');
-            btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+            if (scrollTopBtn) {
+                scrollTopBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+            }
         });
     });
 
@@ -1064,10 +1126,6 @@
         if (counterEl) {
             counterEl.textContent = `Mostrando ${totalVisibleCards} conjuro${totalVisibleCards === 1 ? '' : 's'}`;
         }
-    }
-
-    function scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
 
